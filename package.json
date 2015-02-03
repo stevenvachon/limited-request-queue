@@ -1,0 +1,47 @@
+{
+  "name": "concurrent-host",
+  "description": "Manages per-host concurrency for modules like request.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/stevenvachon/concurrent-host",
+  "author": {
+    "name": "Steven Vachon",
+    "email": "contact@svachon.com",
+    "url": "http://www.svachon.com/"
+  },
+  "main": "lib",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/stevenvachon/concurrent-host.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stevenvachon/concurrent-host/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/mit-license.php"
+    }
+  ],
+  "dependencies": {
+    "object-assign": "^2.0.0",
+    "parse-domain": "~0.1.2"
+  },
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "mocha": "^2.1.0"
+  },
+  "engines": {
+    "node": ">= 0.10"
+  },
+  "scripts": {
+    "test": "mocha test.js --reporter spec --check-leaks --bail"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "concurrency",
+    "http",
+    "request"
+  ]
+}
