@@ -1,8 +1,8 @@
 {
-  "name": "concurrent-host",
-  "description": "Manages per-host concurrency for modules like request.",
-  "version": "0.1.0",
-  "homepage": "https://github.com/stevenvachon/concurrent-host",
+  "name": "concurrent-request-queue",
+  "description": "Interactively manage concurrency for modules like \"request\".",
+  "version": "0.2.0",
+  "homepage": "https://github.com/stevenvachon/concurrent-request-queue",
   "author": {
     "name": "Steven Vachon",
     "email": "contact@svachon.com",
@@ -11,10 +11,10 @@
   "main": "lib",
   "repository": {
     "type": "git",
-    "url": "git://github.com/stevenvachon/concurrent-host.git"
+    "url": "git://github.com/stevenvachon/concurrent-request-queue.git"
   },
   "bugs": {
-    "url": "https://github.com/stevenvachon/concurrent-host/issues"
+    "url": "https://github.com/stevenvachon/concurrent-request-queue/issues"
   },
   "licenses": [
     {
@@ -27,21 +27,26 @@
     "parse-domain": "~0.1.2"
   },
   "devDependencies": {
-    "chai": "^1.10.0",
-    "mocha": "^2.1.0"
+    "chai": "^2.1.1",
+    "mocha": "^2.2.0"
   },
   "engines": {
     "node": ">= 0.10"
   },
   "scripts": {
-    "test": "mocha test.js --reporter spec --check-leaks --bail"
+    "test": "mocha test/ --reporter spec --check-leaks --bail"
   },
   "files": [
-    "index.js"
+    "lib"
   ],
   "keywords": [
     "concurrency",
+    "ddos",
     "http",
-    "request"
+    "limiting",
+    "queue",
+    "rate",
+    "request",
+    "throttle"
   ]
 }
