@@ -1,6 +1,8 @@
 "use strict";
 var ConcurrentHosts = require("../lib");
 
+var objectAssign = require("object-assign");
+
 var _urls = 
 [
 	"https://www.google.com/",
@@ -46,6 +48,25 @@ function doneCheck(result, results, urls, callback)
 
 
 
+function options(overrides)
+{
+	return objectAssign
+	(
+		{},
+		{
+			ignorePorts: false,
+			ignoreSchemes: false,
+			ignoreSubdomains: false,
+			maxSockets: Infinity,
+			maxSocketsPerHost: Infinity,
+			rateLimit: 0
+		},
+		overrides
+	);
+}
+
+
+
 function testUrls(urls, libOptions, callback)
 {
 	var concurrency = new ConcurrentHosts(libOptions);
@@ -75,6 +96,7 @@ function testUrls(urls, libOptions, callback)
 
 module.exports = 
 {
+	options: options,
 	testUrls: testUrls,
 	urls: _urls
 };

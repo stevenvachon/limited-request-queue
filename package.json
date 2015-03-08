@@ -1,7 +1,7 @@
 {
   "name": "concurrent-request-queue",
   "description": "Interactively manage concurrency for modules like \"request\".",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "homepage": "https://github.com/stevenvachon/concurrent-request-queue",
   "author": {
     "name": "Steven Vachon",

@@ -9,11 +9,47 @@ describe("Public API", function()
 {
 	describe("Options", function()
 	{
+		describe("all disabled", function()
+		{
+			it("should work", function(done)
+			{
+				utils.testUrls(utils.urls, utils.options(), function(results)
+				{
+					expect(results).to.deep.equal(
+					[
+						"https://www.google.com/",
+						"https://www.google.com/",
+						"http://www.google.com/",
+						"http://www.google.com/",
+						"https://google.com/",
+						"https://google.com/",
+						"http://google.com/",
+						"http://google.com/",
+						"https://google.com:8080/",
+						"https://google.com:8080/",
+						"http://google.com:8080/",
+						"http://google.com:8080/",
+						"https://google.com/something.html",
+						"https://google.com/something.html",
+						"http://google.com/something.html",
+						"http://google.com/something.html",
+						"https://127.0.0.1/",
+						"https://127.0.0.1/",
+						"http://127.0.0.1/",
+						"http://127.0.0.1/"
+					]);
+					done();
+				});
+			});
+		});
+		
+		
+		
 		describe("maxSocketsPerHost=1", function()
 		{
 			it("should work", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:false, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:1}, function(results)
+				utils.testUrls(utils.urls, utils.options({ maxSocketsPerHost:1 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -48,7 +84,7 @@ describe("Public API", function()
 			
 			it("should work with ignorePorts=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:true, ignoreSchemes:false, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:1}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, maxSocketsPerHost:1 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -86,7 +122,7 @@ describe("Public API", function()
 			
 			it("should work with ignoreSchemes=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:true, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:1}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignoreSchemes:true, maxSocketsPerHost:1 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -128,7 +164,7 @@ describe("Public API", function()
 			
 			it("should work with ignoreSubdomains=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:false, ignoreSubdomains:true, maxSockets:Infinity, maxSocketsPerHost:1}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignoreSubdomains:true, maxSocketsPerHost:1 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -167,7 +203,7 @@ describe("Public API", function()
 			
 			it("should work with all options true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSockets:Infinity, maxSocketsPerHost:1}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:1 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -206,7 +242,7 @@ describe("Public API", function()
 		{
 			it("should work", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:false, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:2}, function(results)
+				utils.testUrls(utils.urls, utils.options({ maxSocketsPerHost:2 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -241,7 +277,7 @@ describe("Public API", function()
 			
 			it("should work with ignorePorts=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:true, ignoreSchemes:false, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:2}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, maxSocketsPerHost:2 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -277,7 +313,7 @@ describe("Public API", function()
 			
 			it("should work with ignoreSchemes=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:true, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:2}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignoreSchemes:true, maxSocketsPerHost:2 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -313,7 +349,7 @@ describe("Public API", function()
 			
 			it("should work with ignoreSubdomains=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:false, ignoreSubdomains:true, maxSockets:Infinity, maxSocketsPerHost:2}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignoreSubdomains:true, maxSocketsPerHost:2 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -350,7 +386,7 @@ describe("Public API", function()
 			
 			it("should work with all options true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSockets:Infinity, maxSocketsPerHost:2}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:2 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -392,7 +428,7 @@ describe("Public API", function()
 		{
 			it("should work", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:false, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:3}, function(results)
+				utils.testUrls(utils.urls, utils.options({ maxSocketsPerHost:3 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -428,7 +464,7 @@ describe("Public API", function()
 			
 			it("should work with ignorePorts=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:true, ignoreSchemes:false, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:3}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, maxSocketsPerHost:3 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -466,7 +502,7 @@ describe("Public API", function()
 			
 			it("should work with ignoreSchemes=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:true, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:3}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignoreSchemes:true, maxSocketsPerHost:3 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -505,7 +541,7 @@ describe("Public API", function()
 			
 			it("should work with ignoreSubdomains=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:false, ignoreSubdomains:true, maxSockets:Infinity, maxSocketsPerHost:3}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignoreSubdomains:true, maxSocketsPerHost:3 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -544,7 +580,7 @@ describe("Public API", function()
 			
 			it("should work with all options true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSockets:Infinity, maxSocketsPerHost:3}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:3 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -587,7 +623,7 @@ describe("Public API", function()
 		{
 			it("should work", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:false, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:4}, function(results)
+				utils.testUrls(utils.urls, utils.options({ maxSocketsPerHost:4 }), function(results)
 				{
 					expect(results).to.deep.equal(utils.urls);
 					done();
@@ -598,7 +634,7 @@ describe("Public API", function()
 			
 			it("should work with ignorePorts=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:true, ignoreSchemes:false, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:4}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, maxSocketsPerHost:4 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -633,7 +669,7 @@ describe("Public API", function()
 			
 			it("should work with ignoreSchemes=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:true, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:4}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignoreSchemes:true, maxSocketsPerHost:4 }), function(results)
 				{
 					expect(results).to.deep.equal(utils.urls);
 					done();
@@ -644,7 +680,7 @@ describe("Public API", function()
 			
 			it("should work with ignoreSubdomains=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:false, ignoreSubdomains:true, maxSockets:Infinity, maxSocketsPerHost:4}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignoreSubdomains:true, maxSocketsPerHost:4 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -679,7 +715,7 @@ describe("Public API", function()
 			
 			it("should work with all options true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSockets:Infinity, maxSocketsPerHost:4}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:4 }), function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -717,7 +753,7 @@ describe("Public API", function()
 		{
 			it("should work", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:false, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:Infinity}, function(results)
+				utils.testUrls(utils.urls, utils.options({ maxSocketsPerHost:Infinity }), function(results)
 				{
 					expect(results).to.deep.equal(utils.urls);
 					done();
@@ -728,7 +764,7 @@ describe("Public API", function()
 			
 			it("should work with ignorePorts=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:true, ignoreSchemes:false, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:Infinity}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, maxSocketsPerHost:Infinity }), function(results)
 				{
 					expect(results).to.deep.equal(utils.urls);
 					done();
@@ -739,7 +775,7 @@ describe("Public API", function()
 			
 			it("should work with ignoreSchemes=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:true, ignoreSubdomains:false, maxSockets:Infinity, maxSocketsPerHost:Infinity}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignoreSchemes:true, maxSocketsPerHost:Infinity }), function(results)
 				{
 					expect(results).to.deep.equal(utils.urls);
 					done();
@@ -750,7 +786,7 @@ describe("Public API", function()
 			
 			it("should work with ignoreSubdomains=true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:false, ignoreSchemes:false, ignoreSubdomains:true, maxSockets:Infinity, maxSocketsPerHost:Infinity}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignoreSubdomains:true, maxSocketsPerHost:Infinity }), function(results)
 				{
 					expect(results).to.deep.equal(utils.urls);
 					done();
@@ -761,7 +797,7 @@ describe("Public API", function()
 			
 			it("should work with all options true", function(done)
 			{
-				utils.testUrls(utils.urls, {ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSockets:Infinity, maxSocketsPerHost:Infinity}, function(results)
+				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:Infinity }), function(results)
 				{
 					expect(results).to.deep.equal(utils.urls);
 					done();
@@ -782,37 +818,40 @@ describe("Public API", function()
 		
 		
 		
-		it("should support default options", function(done)
+		describe("default options", function()
 		{
-			utils.testUrls(utils.urls, undefined, function(results)
+			it("should work", function(done)
 			{
-				expect(results).to.deep.equal(
-				[
-					"https://www.google.com/",
-					"https://127.0.0.1/",
-					"https://www.google.com/",
-					"https://127.0.0.1/",
-					"http://www.google.com/",
-					"http://127.0.0.1/",
-					"http://www.google.com/",
-					"http://127.0.0.1/",
-					
-					"https://google.com/",
-					"https://google.com/",
-					"http://google.com/",
-					"http://google.com/",
-					
-					"https://google.com:8080/",
-					"https://google.com:8080/",
-					"http://google.com:8080/",
-					"http://google.com:8080/",
-					
-					"https://google.com/something.html",
-					"https://google.com/something.html",
-					"http://google.com/something.html",
-					"http://google.com/something.html"
-				]);
-				done();
+				utils.testUrls(utils.urls, undefined, function(results)
+				{
+					expect(results).to.deep.equal(
+					[
+						"https://www.google.com/",
+						"https://127.0.0.1/",
+						"https://www.google.com/",
+						"https://127.0.0.1/",
+						"http://www.google.com/",
+						"http://127.0.0.1/",
+						"http://www.google.com/",
+						"http://127.0.0.1/",
+						
+						"https://google.com/",
+						"https://google.com/",
+						"http://google.com/",
+						"http://google.com/",
+						
+						"https://google.com:8080/",
+						"https://google.com:8080/",
+						"http://google.com:8080/",
+						"http://google.com:8080/",
+						
+						"https://google.com/something.html",
+						"https://google.com/something.html",
+						"http://google.com/something.html",
+						"http://google.com/something.html"
+					]);
+					done();
+				});
 			});
 		});
 	});

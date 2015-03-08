@@ -1,6 +1,7 @@
 "use strict";
 var getHostKey = require("../lib/getHostKey");
 var getId = require("../lib/getId");
+var utils = require("./utils");
 
 var expect = require("chai").expect;
 
@@ -12,7 +13,7 @@ describe("Internal API", function()
 	{
 		it("should work", function(done)
 		{
-			var options = {ignorePorts:false, ignoreSchemes:false, ignoreSubdomains:false};
+			var options = utils.options();
 			
 			expect( getHostKey("https://www.google.com:8080/",options) ).to.equal("https://www.google.com:8080/");
 			expect( getHostKey("https://127.0.0.1:8080/",options) ).to.equal("https://127.0.0.1:8080/");
@@ -23,7 +24,7 @@ describe("Internal API", function()
 		
 		it("should support options.ignorePorts=true", function(done)
 		{
-			var options = {ignorePorts:true, ignoreSchemes:false, ignoreSubdomains:false};
+			var options = utils.options({ ignorePorts:true });
 			
 			expect( getHostKey("https://www.google.com:8080/",options) ).to.equal("https://www.google.com/");
 			expect( getHostKey("https://127.0.0.1/",options) ).to.equal("https://127.0.0.1/");
@@ -34,7 +35,7 @@ describe("Internal API", function()
 		
 		it("should support options.ignoreSchemes=true", function(done)
 		{
-			var options = {ignorePorts:false, ignoreSchemes:true, ignoreSubdomains:false};
+			var options = utils.options({ ignoreSchemes:true });
 			
 			expect( getHostKey("https://www.google.com:8080/",options) ).to.equal("www.google.com:8080/");
 			expect( getHostKey("https://127.0.0.1:8080/",options) ).to.equal("127.0.0.1:8080/");
@@ -45,7 +46,7 @@ describe("Internal API", function()
 		
 		it("should support options.ignoreSubdomains=true", function(done)
 		{
-			var options = {ignorePorts:false, ignoreSchemes:false, ignoreSubdomains:true};
+			var options = utils.options({ ignoreSubdomains:true });
 			
 			expect( getHostKey("https://www.google.com:8080/",options) ).to.equal("https://google.com:8080/");
 			expect( getHostKey("https://127.0.0.1:8080/",options) ).to.equal("https://127.0.0.1:8080/");
@@ -56,7 +57,7 @@ describe("Internal API", function()
 		
 		it("should support all options true", function(done)
 		{
-			var options = {ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true};
+			var options = utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true });
 			
 			expect( getHostKey("https://www.google.com:8080/",options) ).to.equal("google.com/");
 			expect( getHostKey("https://127.0.0.1:8080/",options) ).to.equal("127.0.0.1/");
