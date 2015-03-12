@@ -1,7 +1,11 @@
 "use strict";
-var ConcurrentHosts = require("../lib");
+var RequestQueue = require("../lib");
 
 var objectAssign = require("object-assign");
+
+var delay = 50;
+
+var durations = [];
 
 var _urls = 
 [
@@ -38,11 +42,45 @@ var _urls =
 
 
 
-function doneCheck(result, results, urls, callback)
+function addDurationGroup()
 {
+	durations.push([]);
+}
+
+
+
+function clearDurations()
+{
+	durations.length = 0;
+}
+
+
+
+function compareDurations(duration, callback)
+{
+	var curGroup = durations[ durations.length-1 ];
+	var prevGroupDuration;
+	
+	curGroup.push(duration);
+	
+	if (durations.length > 1)
+	{
+		prevGroupDuration = durations[durations.length-2][ curGroup.length-1 ];
+		callback(prevGroupDuration);
+	}
+}
+
+
+
+function doneCheck(result, results, urls, startTime, callback)
+{
+	var duration;
+	
 	if (results.push(result) >= urls.length)
 	{
-		callback(results);
+		duration = Date.now() - startTime;
+		
+		callback(results, duration);
 	}
 }
 
@@ -54,6 +92,7 @@ function options(overrides)
 	(
 		{},
 		{
+			defaultPorts: {ftp:21, http:80, https:443},
 			ignorePorts: false,
 			ignoreSchemes: false,
 			ignoreSubdomains: false,
@@ -67,26 +106,33 @@ function options(overrides)
 
 
 
-function testUrls(urls, libOptions, callback)
+function testUrls(urls, libOptions, completeCallback, eachCallback)
 {
-	var concurrency = new ConcurrentHosts(libOptions);
+	var queue = new RequestQueue(libOptions);
 	var results = [];
+	var startTime = Date.now();
 	
 	urls.forEach( function(url)
 	{
-		concurrency.enqueue(url, function(error, id)
+		queue.enqueue(url, function(error, id, url)
 		{
+			if (typeof eachCallback === "function")
+			{
+				eachCallback(url, queue);
+			}
+			
 			if (error !== null)
 			{
-				doneCheck(error, results, urls, callback);
+				doneCheck(error, results, urls, startTime, completeCallback);
 			}
 			else
 			{
+				// Simulate a remote connection
 				setTimeout( function()
 				{
-					concurrency.dequeue(id);
-					doneCheck(url, results, urls, callback);
-				}, 50);
+					queue.dequeue(id);
+					doneCheck(url, results, urls, startTime, completeCallback);
+				}, delay);
 			}
 		});
 	});
@@ -96,7 +142,12 @@ function testUrls(urls, libOptions, callback)
 
 module.exports = 
 {
+	addDurationGroup: addDurationGroup,
+	clearDurations: clearDurations,
+	compareDurations: compareDurations,
+	delay: delay,
 	options: options,
+	RequestQueue: RequestQueue,
 	testUrls: testUrls,
 	urls: _urls
 };

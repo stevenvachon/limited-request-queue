@@ -1,8 +1,8 @@
 {
-  "name": "concurrent-request-queue",
+  "name": "limited-request-queue",
   "description": "Interactively manage concurrency for modules like \"request\".",
-  "version": "0.3.0",
-  "homepage": "https://github.com/stevenvachon/concurrent-request-queue",
+  "version": "0.4.0",
+  "homepage": "https://github.com/stevenvachon/limited-request-queue",
   "author": {
     "name": "Steven Vachon",
     "email": "contact@svachon.com",
@@ -11,10 +11,10 @@
   "main": "lib",
   "repository": {
     "type": "git",
-    "url": "git://github.com/stevenvachon/concurrent-request-queue.git"
+    "url": "git://github.com/stevenvachon/limited-request-queue.git"
   },
   "bugs": {
-    "url": "https://github.com/stevenvachon/concurrent-request-queue/issues"
+    "url": "https://github.com/stevenvachon/limited-request-queue/issues"
   },
   "licenses": [
     {
@@ -27,19 +27,25 @@
     "parse-domain": "~0.1.2"
   },
   "devDependencies": {
+    "browserify": "^9.0.3",
     "chai": "^2.1.1",
-    "mocha": "^2.2.0"
+    "mocha": "^2.2.1",
+    "uglify-js": "^2.4.17",
+    "url-parse": "^1.0.0"
   },
   "engines": {
     "node": ">= 0.10"
   },
   "scripts": {
+    "browserify": "browserify lib/ --exclude parse-domain --exclude url --standalone RequestQueue | uglifyjs --compress --mangle -o browser/requestqueue.js",
+    "prepublish": "npm run browserify",
     "test": "mocha test/ --reporter spec --check-leaks --bail"
   },
   "files": [
     "lib"
   ],
   "keywords": [
+    "background",
     "concurrency",
     "ddos",
     "http",

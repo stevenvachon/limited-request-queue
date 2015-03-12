@@ -1,29 +1,31 @@
-# concurrent-request-queue [![NPM Version](http://badge.fury.io/js/concurrent-request-queue.svg)](http://badge.fury.io/js/concurrent-request-queue) [![Build Status](https://secure.travis-ci.org/stevenvachon/concurrent-request-queue.svg)](http://travis-ci.org/stevenvachon/concurrent-request-queue) [![Dependency Status](https://david-dm.org/stevenvachon/concurrent-request-queue.svg)](https://david-dm.org/stevenvachon/concurrent-request-queue)
+# limited-request-queue [![NPM Version](http://badge.fury.io/js/limited-request-queue.svg)](http://badge.fury.io/js/limited-request-queue) [![Build Status](https://secure.travis-ci.org/stevenvachon/limited-request-queue.svg)](http://travis-ci.org/stevenvachon/limited-request-queue) [![Dependency Status](https://david-dm.org/stevenvachon/limited-request-queue.svg)](https://david-dm.org/stevenvachon/limited-request-queue)
 > Interactively manage concurrency for modules like [request](https://npmjs.com/package/request).
 
 Features:
 * Concurrency & rate limiting prevents overload on your server
 * Per-Host concurrency limiting prevents overload on everyone else's server
 * Pause/Resume at any time
+* Works in the browser (~7KB)
 
 ```js
-// Will work with any similar module, not just this one
+// Will work with any similar module, not just "request"
 var request = require("request");
+var RequestQueue = require("limited-request-queue");
 
 var options = { maxSocketsPerHost:1 };
-var requests = new (require("concurrent-request-queue"))(options);
+var handlers = {
+	drain: function() {
+		console.log("Queue completed!");
+	}
+};
+var queue = new RequestQueue(options, handlers);
 
 var urls = ["http://website.com/dir1/", "http://website.com/dir2/"];
-var count = 0;
 
 urls.forEach( function(url) {
-	requests.enqueue(url, function(error, id) {
+	queue.enqueue(url, function(error, id, url) {
 		request(url, function(error, response) {
-			requests.dequeue(id);
-			
-			if (++count >= urls.length) {
-				console.log("done!");
-			}
+			queue.dequeue(id);
 		});
 	});
 });
@@ -34,17 +36,20 @@ urls.forEach( function(url) {
 
 [Node.js](http://nodejs.org/) `~0.10` is required. To install, type this at the command line:
 ```shell
-npm install concurrent-request-queue --save-dev
+npm install limited-request-queue --save-dev
 ```
 
 
 ## Methods
 
 ### .dequeue(id)
-Removes a URL queue item (from `enqueue()`) from its host queue. Use this when you are finished with a particular URL so that the next in line can be triggered. Returns `true` on a success and `false` if the queue item could not be found.
+Removes a URL queue item (from `enqueue()`) from its host queue. Use this when you are finished with a particular URL so that the next in line can be triggered. Returns `true` on success and `false` if the queue item could not be found.
 
 ### .enqueue(url[, id], callback)
-Adds a URL to a host queue. If `id` is not defined, a value will be generated. When the URL's turn has been reached, `callback` will be called with two arguments: `error` if `url` or `id` is invalid and `id` for use in dequeuing.
+Adds a URL to a host queue. If `id` is not defined, a value will be generated. When the URL's turn has been reached, `callback` will be called with three arguments: `error` if `url` or `id` is invalid and `id` for use in dequeuing and `url`.
+
+### .length()
+Returns the number of items in the queue.
 
 ### .pause()
 Pauses the queue, but will not pause any active requests.
@@ -70,6 +75,8 @@ Type: `Boolean`
 Default value: `true`  
 Whether or not to treat identical hosts of different subdomains as a single concurrent group. **Example:** when `true`, http://mywebsite.com and http://www.mywebsite.com may not have outgoing connections at the same time, but http://mywebsite.com and http://www.yourwebsite.com will.
 
+This option is not available in the browser version (due to extreme file size).
+
 ### options.maxSockets
 Type: `Number`  
 Default value: `Infinity`  
@@ -83,9 +90,10 @@ The maximum number of connections per host allowed at any given time. A value of
 ### options.rateLimit
 Type: `Number`  
 Default value: `0`  
-The number of milliseconds to wait before each request.
+The number of milliseconds to wait before each request. For a typical rate limiter, also set `maxSockets` to `1`.
 
 
-## Roadmap Features
-* add complete handler/function; use promises?
-* browserify with parse-domain ommitted (due to size)
+## Handlers
+
+### handlers.drain
+Called when the queue has been emptied.
