@@ -3,7 +3,7 @@ var RequestQueue = require("../lib");
 
 var objectAssign = require("object-assign");
 
-var delay = 50;
+var delay = 15;
 
 var durations = [];
 
@@ -86,6 +86,13 @@ function doneCheck(result, results, urls, startTime, callback)
 
 
 
+function expectedSyncMinDuration()
+{
+	return _urls.length * delay + 50;
+}
+
+
+
 function options(overrides)
 {
 	return objectAssign
@@ -108,34 +115,39 @@ function options(overrides)
 
 function testUrls(urls, libOptions, completeCallback, eachCallback)
 {
-	var queue = new RequestQueue(libOptions);
+	var queued;
 	var results = [];
 	var startTime = Date.now();
 	
-	urls.forEach( function(url)
+	var queue = new RequestQueue(libOptions, 
 	{
-		queue.enqueue(url, function(error, id, url)
+		error: function(error, id, url, data)
 		{
 			if (typeof eachCallback === "function")
 			{
 				eachCallback(url, queue);
 			}
 			
-			if (error !== null)
+			doneCheck(error, results, urls, startTime, completeCallback);
+		},
+		item: function(id, url, data)
+		{
+			if (typeof eachCallback === "function")
 			{
-				doneCheck(error, results, urls, startTime, completeCallback);
+				eachCallback(url, queue);
 			}
-			else
+			
+			// Simulate a remote connection
+			setTimeout( function()
 			{
-				// Simulate a remote connection
-				setTimeout( function()
-				{
-					queue.dequeue(id);
-					doneCheck(url, results, urls, startTime, completeCallback);
-				}, delay);
-			}
-		});
+				queue.dequeue(id);
+				doneCheck(url, results, urls, startTime, completeCallback);
+				
+			}, delay);
+		}
 	});
+	
+	urls.forEach(queue.enqueue, queue);
 }
 
 
@@ -146,6 +158,7 @@ module.exports =
 	clearDurations: clearDurations,
 	compareDurations: compareDurations,
 	delay: delay,
+	expectedSyncMinDuration: expectedSyncMinDuration,
 	options: options,
 	RequestQueue: RequestQueue,
 	testUrls: testUrls,

@@ -1,7 +1,7 @@
 {
   "name": "limited-request-queue",
   "description": "Interactively manage concurrency for modules like \"request\".",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "homepage": "https://github.com/stevenvachon/limited-request-queue",
   "author": {
     "name": "Steven Vachon",
@@ -28,9 +28,9 @@
   },
   "devDependencies": {
     "browserify": "^9.0.3",
-    "chai": "^2.1.1",
+    "chai": "^2.2.0",
     "mocha": "^2.2.1",
-    "uglify-js": "^2.4.17",
+    "uglify-js": "^2.4.19",
     "url-parse": "^1.0.0"
   },
   "engines": {

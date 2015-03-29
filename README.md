@@ -12,23 +12,19 @@ Features:
 var request = require("request");
 var RequestQueue = require("limited-request-queue");
 
-var options = { maxSocketsPerHost:1 };
-var handlers = {
-	drain: function() {
-		console.log("Queue completed!");
-	}
-};
-var queue = new RequestQueue(options, handlers);
-
-var urls = ["http://website.com/dir1/", "http://website.com/dir2/"];
-
-urls.forEach( function(url) {
-	queue.enqueue(url, function(error, id, url) {
+var queue = new RequestQueue(null, {
+	item: function(id, url, data) {
 		request(url, function(error, response) {
 			queue.dequeue(id);
 		});
-	});
+	},
+	end: function() {
+		console.log("Queue completed!");
+	}
 });
+
+var urls = ["http://website.com/dir1/", "http://website.com/dir2/"];
+urls.forEach(queue.enqueue, queue);
 ```
 
 
@@ -40,13 +36,24 @@ npm install limited-request-queue --save-dev
 ```
 
 
+## Constructor
+```js
+new RequestQueue(options, handlers);
+```
+
+
 ## Methods
 
 ### .dequeue(id)
-Removes a URL queue item (from `enqueue()`) from its host queue. Use this when you are finished with a particular URL so that the next in line can be triggered. Returns `true` on success and `false` if the queue item could not be found.
+Removes a URL queue item from its host queue. Use this when you are finished with a particular URL so that the next in line can be triggered. Returns `true` on success or an `Error` on failure.
 
-### .enqueue(url[, id], callback)
-Adds a URL to a host queue. If `id` is not defined, a value will be generated. When the URL's turn has been reached, `callback` will be called with three arguments: `error` if `url` or `id` is invalid and `id` for use in dequeuing and `url`.
+### .enqueue(input)
+Adds a URL to a host queue. `input` can either be a URL `String` or an `Object`. Returns a queue ID on success or an `Error` on failure.
+
+If `input` is an `Object`, it will acccept the following keys:
+* `url`: a URL `String`
+* `id`: a unique ID (`String` or `Number`). If not defined, one will be generated.
+* `data`: custom data to be stored in the queue.
 
 ### .length()
 Returns the number of items in the queue.
@@ -95,5 +102,11 @@ The number of milliseconds to wait before each request. For a typical rate limit
 
 ## Handlers
 
-### handlers.drain
-Called when the queue has been emptied.
+### handlers.end
+Called when the last item in the queue has been dequeued. Arguments are: `id`, `url`, `data`.
+
+### handlers.error
+Called when an item could not be enqueued or dequeued. Arguments are: `error`, `id`, `url`, `data`.
+
+### handlers.item
+Called when a queue item's turn has been reached. There are no arguments.

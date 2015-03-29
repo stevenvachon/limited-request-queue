@@ -63,6 +63,18 @@ describe("Internal API", function()
 			expect( getHostKey("https://127.0.0.1:8080/",options) ).to.equal("127.0.0.1/");
 			done();
 		});
+		
+		
+		
+		it("should avoid erroneous URLs", function(done)
+		{
+		    var options = utils.options();
+		    
+		    expect( getHostKey("/path/",options) ).to.be.false;
+		    expect( getHostKey("resource.html",options) ).to.be.false;
+		    expect( getHostKey("",options) ).to.be.false;
+		    done();
+		});
 	});
 	
 	
@@ -73,7 +85,7 @@ describe("Internal API", function()
 		{
 			var collisions = [];
 			
-			// Create array with 100 IDs, sorted for visual aid
+			// Create array with 1000 IDs, sorted for visual aid
 			var test = [];
 			for (var i=0; i<1000; i++){ test.push( getId() ) }
 			test.sort( function(a,b){ return a-b } );
