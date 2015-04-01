@@ -1,7 +1,7 @@
 {
   "name": "limited-request-queue",
   "description": "Interactively manage concurrency for modules like \"request\".",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "homepage": "https://github.com/stevenvachon/limited-request-queue",
   "author": {
     "name": "Steven Vachon",

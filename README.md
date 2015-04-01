@@ -13,9 +13,9 @@ var request = require("request");
 var RequestQueue = require("limited-request-queue");
 
 var queue = new RequestQueue(null, {
-	item: function(id, url, data) {
-		request(url, function(error, response) {
-			queue.dequeue(id);
+	item: function(input, done) {
+		request(input.url, function(error, response) {
+			done();
 		});
 	},
 	end: function() {
@@ -25,6 +25,9 @@ var queue = new RequestQueue(null, {
 
 var urls = ["http://website.com/dir1/", "http://website.com/dir2/"];
 urls.forEach(queue.enqueue, queue);
+
+setTimeout(queue.pause, 500);
+setTimeout(queue.resume, 5000);
 ```
 
 
@@ -45,18 +48,21 @@ new RequestQueue(options, handlers);
 ## Methods
 
 ### .dequeue(id)
-Removes a URL queue item from its host queue. Use this when you are finished with a particular URL so that the next in line can be triggered. Returns `true` on success or an `Error` on failure.
+Removes a queue item from the queue. Use of this function is likely not needed as items are auto-dequeued when their turn is reached. Returns `true` on success or an `Error` on failure.
 
 ### .enqueue(input)
-Adds a URL to a host queue. `input` can either be a URL `String` or an `Object`. Returns a queue ID on success or an `Error` on failure.
+Adds a URL to the queue. `input` can either be a URL `String` or an `Object`. Returns a queue ID on success or an `Error` on failure.
 
 If `input` is an `Object`, it will acccept the following keys:
-* `url`: a URL `String`
+* `url`: a URL `String`.
+* `data`: additional data to be stored in the queue item.
 * `id`: a unique ID (`String` or `Number`). If not defined, one will be generated.
-* `data`: custom data to be stored in the queue.
 
 ### .length()
 Returns the number of items in the queue.
+
+### .numActive()
+Returns the number of active requests.
 
 ### .pause()
 Pauses the queue, but will not pause any active requests.
@@ -103,10 +109,10 @@ The number of milliseconds to wait before each request. For a typical rate limit
 ## Handlers
 
 ### handlers.end
-Called when the last item in the queue has been dequeued. Arguments are: `id`, `url`, `data`.
+Called when the last item in the queue has been completed.
 
 ### handlers.error
-Called when an item could not be enqueued or dequeued. Arguments are: `error`, `id`, `url`, `data`.
+Called when an item could not be enqueued or dequeued. Arguments are: `error`, `id`, `input`.
 
 ### handlers.item
-Called when a queue item's turn has been reached. There are no arguments.
+Called when a queue item's turn has been reached. Arguments are: `input`, `done`.

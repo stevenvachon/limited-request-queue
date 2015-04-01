@@ -121,27 +121,27 @@ function testUrls(urls, libOptions, completeCallback, eachCallback)
 	
 	var queue = new RequestQueue(libOptions, 
 	{
-		error: function(error, id, url, data)
+		error: function(error, id, input)
 		{
 			if (typeof eachCallback === "function")
 			{
-				eachCallback(url, queue);
+				eachCallback(input, queue);
 			}
 			
 			doneCheck(error, results, urls, startTime, completeCallback);
 		},
-		item: function(id, url, data)
+		item: function(input, done)
 		{
 			if (typeof eachCallback === "function")
 			{
-				eachCallback(url, queue);
+				eachCallback(input, queue);
 			}
 			
 			// Simulate a remote connection
 			setTimeout( function()
 			{
-				queue.dequeue(id);
-				doneCheck(url, results, urls, startTime, completeCallback);
+				done();
+				doneCheck(input.url, results, urls, startTime, completeCallback);
 				
 			}, delay);
 		}

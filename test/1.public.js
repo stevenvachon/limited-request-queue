@@ -9,6 +9,31 @@ describe("Public API", function()
 {
 	describe("Enqueue / Dequeue", function()
 	{
+		it("valid URLs should be enqueued", function(done)
+		{
+			var queue = new utils.RequestQueue(utils.options());
+			
+			expect( queue.enqueue(utils.urls[0]) ).to.be.a("number");
+			done();
+		});
+		
+		
+		
+		it("valid IDs should be dequeued", function(done)
+		{
+			var queue = new utils.RequestQueue(utils.options());
+			
+			// Prevent first queued item from immediately starting (and thus being auto-dequeued)
+			queue.pause();
+			
+			var id = queue.enqueue(utils.urls[0]);
+			
+			expect( queue.dequeue(id) ).to.be.true;
+			done();
+		});
+		
+		
+		
 		it("erroneous URLs should be reported with enqueue()", function(done)
 		{
 			var queue = new utils.RequestQueue(utils.options());
@@ -47,7 +72,7 @@ describe("Public API", function()
 				var count = 0;
 				var queue = new utils.RequestQueue(utils.options(),
 				{
-					item: function(id, url, data)
+					item: function(url, data, done2)
 					{
 						if (++count >= utils.urls.length)
 						{
@@ -66,29 +91,29 @@ describe("Public API", function()
 				var count = 0;
 				var queue = new utils.RequestQueue(utils.options(),
 				{
-					item: function(id, url, data)
+					item: function(input, done2)
 					{
 						switch (++count)
 						{
 							case 1:
 							{
-								expect(id).to.equal(0);
-								expect(url).to.equal(utils.urls[0]);
-								expect(data).to.equal(1);
+								expect(input.id).to.equal(0);
+								expect(input.url).to.equal(utils.urls[0]);
+								expect(input.data).to.equal(1);
 								break;
 							}
 							case 2:
 							{
-								expect(id).to.equal(1);
-								expect(url).to.equal(utils.urls[1]);
-								expect(data).to.equal(2);
+								expect(input.id).to.equal(1);
+								expect(input.url).to.equal(utils.urls[1]);
+								expect(input.data).to.equal(2);
 								break;
 							}
 							case 3:
 							{
-								expect(id).to.equal(2);
-								expect(url).to.equal(utils.urls[2]);
-								expect(data).to.equal(3);
+								expect(input.id).to.equal(2);
+								expect(input.url).to.equal(utils.urls[2]);
+								expect(input.data).to.equal(3);
 								done();
 								break;
 							}
@@ -107,7 +132,7 @@ describe("Public API", function()
 			{
 				var queue = new utils.RequestQueue(utils.options(),
 				{
-					item: function(id, url, data)
+					item: function(input, done2)
 					{
 						done( new Error("this should not have been called") );
 					}
@@ -126,7 +151,7 @@ describe("Public API", function()
 				
 				var queue = new utils.RequestQueue(utils.options(),
 				{
-					item: function(id, url, data)
+					item: function(input, done2)
 					{
 						if (++count == 1)
 						{
@@ -154,9 +179,9 @@ describe("Public API", function()
 			{
 				var queue = new utils.RequestQueue(utils.options(),
 				{
-					item: function(id, url, data)
+					item: function(input, done2)
 					{
-						setTimeout(queue.dequeue.bind(queue), utils.delay, id);
+						setTimeout(done2, utils.delay);
 					},
 					end: function()
 					{
@@ -165,6 +190,31 @@ describe("Public API", function()
 				});
 				
 				utils.urls.forEach(queue.enqueue, queue);
+			});
+			
+			
+			
+			it("should be called when last item is dequeued", function(done)
+			{
+				var queue = new utils.RequestQueue(utils.options(),
+				{
+					end: function()
+					{
+						// Wait for `dequeued` to receive its value
+						// since everything here is performed synchronously
+						setImmediate( function()
+						{
+							expect(dequeued).to.be.true;
+							done();
+						});
+					}
+				});
+				
+				// Prevent first queued item from immediately starting (and thus being auto-dequeued)
+				queue.pause();
+				
+				var id = queue.enqueue(utils.urls[0]);
+				var dequeued = queue.dequeue(id);
 			});
 			
 			
@@ -206,23 +256,23 @@ describe("Public API", function()
 		
 		describe("error", function()
 		{
-			it("should report erroneous IDs", function(done)
+			it("should report erroneous custom IDs", function(done)
 			{
 				var errorCount = 0;
 				var successCount = 0;
 				
 				var queue = new utils.RequestQueue(utils.options(),
 				{
-					error: function(error, id, url, data)
+					error: function(error, id, input)
 					{
 						errorCount++;
 					},
-					item: function(id, url, data)
+					item: function(input, done2)
 					{
 						successCount++;
 						
 						// Simulate a remote connection
-						setTimeout(queue.dequeue.bind(queue), utils.delay, id);
+						setTimeout(done2, utils.delay);
 					},
 					end: function()
 					{
@@ -245,11 +295,11 @@ describe("Public API", function()
 				
 				var queue = new utils.RequestQueue(utils.options(),
 				{
-					error: function(error, id, url, data)
+					error: function(error, id, input)
 					{
 						errorCount++;
 					},
-					item: function(id, url, data)
+					item: function(input, done2)
 					{
 						done( new Error("this should not have been called") );
 					},
@@ -282,7 +332,7 @@ describe("Public API", function()
 				expect(results).to.deep.equal(utils.urls);
 				done();
 			},
-			function(url, queue)
+			function(input, queue)
 			{
 				if (++count === 1)
 				{
