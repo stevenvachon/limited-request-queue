@@ -54,7 +54,8 @@ Removes a queue item from the queue. Use of this function is likely not needed a
 Adds a URL to the queue. `input` can either be a URL `String` or an `Object`. Returns a queue ID on success or an `Error` on failure.
 
 If `input` is an `Object`, it will acccept the following keys:
-* `url`: a URL `String`.
+
+* `url`: a URL `String` or [`url.parse()`](https://nodejs.org/api/url.html#url_url_parse_urlstr_parsequerystring_slashesdenotehost)-compatible `Object`.
 * `data`: additional data to be stored in the queue item.
 * `id`: a unique ID (`String` or `Number`). If not defined, one will be generated.
 

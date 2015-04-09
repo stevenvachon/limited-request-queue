@@ -3,7 +3,7 @@ var RequestQueue = require("../lib");
 
 var objectAssign = require("object-assign");
 
-var delay = 15;
+var delay = 18;	// long enough without trying everyone's patience
 
 var durations = [];
 

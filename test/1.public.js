@@ -2,18 +2,33 @@
 var utils = require("./utils");
 
 var expect = require("chai").expect;
+var urllib = require("url");
 
 
 
+// TODO :: test numActive()
 describe("Public API", function()
 {
-	describe("Enqueue / Dequeue", function()
+	describe("enqueue() / dequeue() / length()", function()
 	{
 		it("valid URLs should be enqueued", function(done)
 		{
 			var queue = new utils.RequestQueue(utils.options());
 			
-			expect( queue.enqueue(utils.urls[0]) ).to.be.a("number");
+			// Prevent first queued item from immediately starting (and thus being auto-dequeued)
+			queue.pause();
+			
+			[
+				utils.urls[0],
+				{ url:utils.urls[0] },
+				{ url:urllib.parse(utils.urls[0]) }
+				
+			].forEach( function(url)
+			{
+				expect( queue.enqueue(url) ).to.be.a("number");
+			});
+			
+			expect( queue.length() ).to.equal(3);
 			done();
 		});
 		
@@ -29,6 +44,7 @@ describe("Public API", function()
 			var id = queue.enqueue(utils.urls[0]);
 			
 			expect( queue.dequeue(id) ).to.be.true;
+			expect( queue.length() ).to.equal(0);
 			done();
 		});
 		
@@ -38,9 +54,20 @@ describe("Public API", function()
 		{
 			var queue = new utils.RequestQueue(utils.options());
 			
-			["/path/","resource.html",""].forEach( function(url)
+			// Prevent first queued item from immediately starting (and thus being auto-dequeued)
+			queue.pause();
+			
+			[
+				"/path/",
+				"resource.html",
+				"",
+				{ url:urllib.parse("/path/") },
+				{ url:{} }
+				
+			].forEach( function(url)
 			{
 				expect( queue.enqueue(url) ).to.be.instanceOf(Error);
+				expect( queue.length() ).to.equal(0);
 			});
 			
 			done();
@@ -52,10 +79,15 @@ describe("Public API", function()
 		{
 			var queue = new utils.RequestQueue(utils.options());
 			
+			// Prevent first queued item from immediately starting (and thus being auto-dequeued)
+			queue.pause();
+			
 			expect( queue.enqueue({id:123, url:utils.urls[0]}) ).to.not.be.instanceOf(Error);
 			expect( queue.enqueue({id:123, url:utils.urls[0]}) ).to.be.instanceOf(Error);
 			
 			expect( queue.dequeue(123456) ).to.be.instanceOf(Error);
+			
+			expect( queue.length() ).to.equal(1);
 			
 			done();
 		});
@@ -319,7 +351,7 @@ describe("Public API", function()
 	
 	
 	
-	describe("Pause / Resume", function()
+	describe("pause() / resume()", function()
 	{
 		it("should work", function(done)
 		{
@@ -347,6 +379,31 @@ describe("Public API", function()
 					}, utils.expectedSyncMinDuration());
 				}
 			});
+		});
+	});
+	
+	
+	
+	describe("numActive()", function()
+	{
+		it("should work", function(done)
+		{
+			var queue = new utils.RequestQueue(utils.options(),
+			{
+				item: function(input, done2)
+				{
+					setTimeout(done2, utils.delay);
+				},
+				end: function()
+				{
+					expect( queue.numActive() ).to.equal(0);
+					done();
+				}
+			});
+			
+			utils.urls.forEach(queue.enqueue, queue);
+			
+			expect( queue.numActive() ).to.equal(utils.urls.length);
 		});
 	});
 	
