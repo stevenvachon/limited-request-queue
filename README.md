@@ -112,8 +112,5 @@ The number of milliseconds to wait before each request. For a typical rate limit
 ### handlers.end
 Called when the last item in the queue has been completed.
 
-### handlers.error
-Called when an item could not be enqueued or dequeued. Arguments are: `error`, `id`, `input`.
-
 ### handlers.item
 Called when a queue item's turn has been reached. Arguments are: `input`, `done`.

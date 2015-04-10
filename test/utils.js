@@ -121,15 +121,6 @@ function testUrls(urls, libOptions, completeCallback, eachCallback)
 	
 	var queue = new RequestQueue(libOptions, 
 	{
-		error: function(error, id, input)
-		{
-			if (typeof eachCallback === "function")
-			{
-				eachCallback(input, queue);
-			}
-			
-			doneCheck(error, results, urls, startTime, completeCallback);
-		},
 		item: function(input, done)
 		{
 			if (typeof eachCallback === "function")
@@ -147,7 +138,24 @@ function testUrls(urls, libOptions, completeCallback, eachCallback)
 		}
 	});
 	
-	urls.forEach(queue.enqueue, queue);
+	urls.forEach( function(url)
+	{
+		var error = queue.enqueue(url);
+		var input;
+		
+		if (error instanceof Error)
+		{
+			if (typeof eachCallback === "function")
+			{
+				// Simulate `item` handler argument
+				input = { url:url };
+				
+				eachCallback(input, queue);
+			}
+			
+			doneCheck(error, results, urls, startTime, completeCallback);
+		}
+	});
 }
 
 
