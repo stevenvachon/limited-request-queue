@@ -1,6 +1,5 @@
 "use strict";
 var getHostKey = require("../lib/getHostKey");
-var getId = require("../lib/getId");
 var utils = require("./utils");
 
 var expect = require("chai").expect;
@@ -68,45 +67,11 @@ describe("Internal API", function()
 		
 		it("should avoid erroneous URLs", function(done)
 		{
-		    var options = utils.options();
-		    
-		    expect( getHostKey("/path/",options) ).to.be.false;
-		    expect( getHostKey("resource.html",options) ).to.be.false;
-		    expect( getHostKey("",options) ).to.be.false;
-		    done();
-		});
-	});
-	
-	
-	
-	describe("getId", function()
-	{
-		it("should not cause collisions", function(done)
-		{
-			var collisions = [];
+			var options = utils.options();
 			
-			// Create array with 1000 IDs, sorted for visual aid
-			var test = [];
-			for (var i=0; i<1000; i++){ test.push( getId() ) }
-			test.sort( function(a,b){ return a-b } );
-			
-			// Check for collisions
-			for (var i=0; i<test.length; i++)
-			{
-			    if (i>0 && test[i]===test[i-1])
-			    {
-			        collisions.push(i);
-			    }
-			}
-			
-			// For visual debugging
-			if (collisions.length > 0)
-			{
-				console.log(test);
-				console.log(collisions);
-			}
-			
-			expect(collisions).to.have.length(0);
+			expect( getHostKey("/path/",options) ).to.be.false;
+			expect( getHostKey("resource.html",options) ).to.be.false;
+			expect( getHostKey("",options) ).to.be.false;
 			done();
 		});
 	});

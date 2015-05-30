@@ -1,6 +1,5 @@
 {
   "name": "limited-request-queue",
-  "version": "0.4.0",
   "homepage": "https://github.com/stevenvachon/limited-request-queue",
   "authors": [
     "Steven Vachon <contact@svachon.com>"

@@ -1,5 +1,6 @@
-# limited-request-queue [![NPM Version](http://badge.fury.io/js/limited-request-queue.svg)](http://badge.fury.io/js/limited-request-queue) [![Build Status](https://secure.travis-ci.org/stevenvachon/limited-request-queue.svg)](http://travis-ci.org/stevenvachon/limited-request-queue) [![Dependency Status](https://david-dm.org/stevenvachon/limited-request-queue.svg)](https://david-dm.org/stevenvachon/limited-request-queue)
-> Interactively manage concurrency for modules like [request](https://npmjs.com/package/request).
+# limited-request-queue [![NPM Version][npm-image]][npm-url] [![Bower Version][bower-image]][bower-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][david-image]][david-url]
+
+> Interactively manage concurrency for outgoing requests.
 
 Features:
 * Concurrency & rate limiting prevents overload on your server
@@ -114,3 +115,13 @@ Called when the last item in the queue has been completed.
 
 ### handlers.item
 Called when a queue item's turn has been reached. Arguments are: `input`, `done`.
+
+
+[npm-image]: https://img.shields.io/npm/v/limited-request-queue.svg
+[npm-url]: https://npmjs.org/package/limited-request-queue
+[bower-image]: https://img.shields.io/bower/v/limited-request-queue.svg
+[bower-url]: https://github.com/stevenvachon/limited-request-queue
+[travis-image]: https://img.shields.io/travis/stevenvachon/limited-request-queue.svg
+[travis-url]: https://travis-ci.org/stevenvachon/limited-request-queue
+[david-image]: https://img.shields.io/david/stevenvachon/limited-request-queue.svg
+[david-url]: https://david-dm.org/stevenvachon/limited-request-queue
