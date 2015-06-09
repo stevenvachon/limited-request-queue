@@ -1,5 +1,5 @@
 "use strict";
-var getHostKey = require("../lib/getHostKey");
+var getHostKey = require("../../lib/getHostKey");
 var utils = require("./utils");
 
 var expect = require("chai").expect;

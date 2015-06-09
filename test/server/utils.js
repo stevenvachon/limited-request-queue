@@ -1,5 +1,5 @@
 "use strict";
-var RequestQueue = require("../lib");
+var RequestQueue = require("../../lib");
 
 var objectAssign = require("object-assign");
 

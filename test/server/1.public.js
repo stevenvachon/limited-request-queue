@@ -6,7 +6,6 @@ var urllib = require("url");
 
 
 
-// TODO :: test numActive()
 describe("Public API", function()
 {
 	describe("enqueue() / dequeue() / length()", function()
@@ -104,7 +103,7 @@ describe("Public API", function()
 				var count = 0;
 				var queue = new utils.RequestQueue(utils.options(),
 				{
-					item: function(url, data, done2)
+					item: function(input, itemDone)
 					{
 						if (++count >= utils.urls.length)
 						{
@@ -123,7 +122,7 @@ describe("Public API", function()
 				var count = 0;
 				var queue = new utils.RequestQueue(utils.options(),
 				{
-					item: function(input, done2)
+					item: function(input, itemDone)
 					{
 						switch (++count)
 						{
@@ -164,7 +163,7 @@ describe("Public API", function()
 			{
 				var queue = new utils.RequestQueue(utils.options(),
 				{
-					item: function(input, done2)
+					item: function(input, itemDone)
 					{
 						done( new Error("this should not have been called") );
 					}
@@ -183,7 +182,7 @@ describe("Public API", function()
 				
 				var queue = new utils.RequestQueue(utils.options(),
 				{
-					item: function(input, done2)
+					item: function(input, itemDone)
 					{
 						if (++count == 1)
 						{
@@ -211,9 +210,9 @@ describe("Public API", function()
 			{
 				var queue = new utils.RequestQueue(utils.options(),
 				{
-					item: function(input, done2)
+					item: function(input, itemDone)
 					{
-						setTimeout(done2, utils.delay);
+						setTimeout(itemDone, utils.delay);
 					},
 					end: function()
 					{
@@ -326,9 +325,9 @@ describe("Public API", function()
 		{
 			var queue = new utils.RequestQueue(utils.options(),
 			{
-				item: function(input, done2)
+				item: function(input, itemDone)
 				{
-					setTimeout(done2, utils.delay);
+					setTimeout(itemDone, utils.delay);
 				},
 				end: function()
 				{
