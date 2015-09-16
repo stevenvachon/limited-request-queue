@@ -34,7 +34,7 @@ setTimeout(queue.resume, 5000);
 
 ## Installation
 
-[Node.js](http://nodejs.org/) `~0.10` is required. To install, type this at the command line:
+[Node.js](http://nodejs.org/) `>= 0.10` is required. To install, type this at the command line:
 ```shell
 npm install limited-request-queue --save-dev
 ```
