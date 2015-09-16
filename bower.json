@@ -1,6 +1,7 @@
 {
   "name": "limited-request-queue",
   "homepage": "https://github.com/stevenvachon/limited-request-queue",
+  "license": "MIT",
   "authors": [
     "Steven Vachon <contact@svachon.com>"
   ],
@@ -19,7 +20,6 @@
   ],
   "license": "MIT",
   "ignore": [
-    "**/.*",
     "bower_components",
     "lib",
     "node_modules",
