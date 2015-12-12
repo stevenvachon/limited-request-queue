@@ -1,7 +1,7 @@
 {
   "name": "limited-request-queue",
   "description": "Interactively manage concurrency for outgoing requests.",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "license": "MIT",
   "homepage": "https://github.com/stevenvachon/limited-request-queue",
   "author": {
@@ -19,24 +19,24 @@
   },
   "dependencies": {
     "is-browser": "^2.0.1",
-    "object-assign": "^4.0.1",
-    "parse-domain": "~0.1.2"
+    "parse-domain": "~0.2.0"
   },
   "devDependencies": {
-    "browserify": "^11.2.0",
-    "chai": "^3.3.0",
-    "mocha": "^2.3.3",
+    "browserify": "^12.0.1",
+    "chai": "^3.4.1",
+    "mocha": "^2.3.4",
     "mocha-phantomjs": "4.0.1",
-    "phantomjs": "1.9.18",
-    "uglify-js": "^2.5.0",
-    "url-parse": "^1.0.4"
+    "object.assign": "^4.0.3",
+    "phantomjs": "1.9.19",
+    "uglify-js": "^2.6.1",
+    "url-parse": "^1.0.5"
   },
   "engines": {
     "node": ">= 0.10"
   },
   "scripts": {
     "browserify": "browserify lib/ --exclude parse-domain --exclude url --standalone RequestQueue | uglifyjs --compress --mangle -o browser/requestqueue.js",
-    "test_browser": "mocha-phantomjs test/browser.html",
+    "test_browser": "npm run browserify && mocha-phantomjs test/browser.html",
     "test_server": "mocha test/server/ --reporter spec --check-leaks --bail",
     "test": "npm run test_server && npm run test_browser"
   },

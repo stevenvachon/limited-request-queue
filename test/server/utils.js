@@ -1,12 +1,10 @@
 "use strict";
 var RequestQueue = require("../../lib");
 
-var objectAssign = require("object-assign");
+require("object.assign").shim();
 
 var delay = 18;	// long enough without trying everyone's patience
-
 var durations = [];
-
 var _urls = 
 [
 	"https://www.google.com/",
@@ -95,7 +93,7 @@ function expectedSyncMinDuration()
 
 function options(overrides)
 {
-	return objectAssign
+	return Object.assign
 	(
 		{},
 		{

@@ -344,6 +344,31 @@ describe("Public API", function()
 	
 	
 	
+	describe("numQueued()", function()
+	{
+		it("should work", function(done)
+		{
+			var queue = new utils.RequestQueue(utils.options(),
+			{
+				item: function(input, itemDone)
+				{
+					setTimeout(itemDone, utils.delay);
+				},
+				end: function()
+				{
+					expect( queue.numQueued() ).to.equal(0);
+					done();
+				}
+			});
+			
+			utils.urls.forEach(queue.enqueue, queue);
+			
+			expect( queue.numQueued() ).to.equal(0);
+		});
+	});
+	
+	
+	
 	describe("Options", function()
 	{
 		describe("all disabled", function()

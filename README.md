@@ -6,7 +6,7 @@ Features:
 * Concurrency & rate limiting prevents overload on your server
 * Per-Host concurrency limiting prevents overload on everyone else's server
 * Pause/Resume at any time
-* Works in the browser (~7KB)
+* Works in the browser (~6.5KB)
 
 ```js
 // Will work with any similar module, not just "request"
@@ -34,9 +34,9 @@ setTimeout(queue.resume, 5000);
 
 ## Installation
 
-[Node.js](http://nodejs.org/) `>= 0.10` is required. To install, type this at the command line:
+[Node.js](http://nodejs.org/) `>= 0.10` is required; `< 4.0` will need an `Object.assign` polyfill. To install, type this at the command line:
 ```shell
-npm install limited-request-queue --save-dev
+npm install limited-request-queue
 ```
 
 
@@ -61,10 +61,13 @@ If `input` is an `Object`, it will acccept the following keys:
 * `id`: a unique ID (`String` or `Number`). If not defined, one will be generated.
 
 ### .length()
-Returns the number of items in the queue.
+Returns the total number of items in the queue, active and non-active.
 
 ### .numActive()
-Returns the number of active requests.
+Returns the number of items whose requests are currently in progress.
+
+### .numQueued()
+Returns the number of items that have not yet made requests.
 
 ### .pause()
 Pauses the queue, but will not pause any active requests.
