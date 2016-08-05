@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <title>limited-request-queue</title>
-<script src="../browser/requestqueue.js"></script>
 <script src="../node_modules/chai/chai.js"></script>
 <script src="../node_modules/mocha/mocha.js"></script>
 <script src="../node_modules/object.assign/dist/browser.js"></script>
+<script src="../node_modules/url-polyfill/url.js"></script><!-- TODO :: use browserified "whatwg-url" when available -->
+<script>if (!window.URL) window.URL = jURL</script>
+<script src="../browser/requestqueue.js"></script>
 <script>mocha.setup("bdd"); expect=chai.expect</script>
-<link rel="stylesheet" href="../node_modules/mocha/mocha.css"/>
+<link rel="stylesheet" href="../node_modules/mocha/mocha.css">
 </head>
 <body>
 <div id="mocha"></div>
@@ -18,9 +20,9 @@ describe("Browser Tests", function()
 {
 	"use strict";
 	
-	it("should work", function(done)
+	it("works", function(done)
 	{
-		// Copied from ../server/utils.js
+		// Copied from ./server/helpers/testUrls.js
 		var urls = [
 			"https://www.google.com/",
 			"https://www.google.com/",

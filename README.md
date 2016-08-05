@@ -1,12 +1,12 @@
 # limited-request-queue [![NPM Version][npm-image]][npm-url] [![Bower Version][bower-image]][bower-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][david-image]][david-url]
 
-> Interactively manage concurrency for outgoing requests.
+> Interactively manage concurrency for outbound requests.
 
 Features:
 * Concurrency & rate limiting prevents overload on your server
-* Per-Host concurrency limiting prevents overload on everyone else's server
+* Per-Host concurrency limiting prevents overload on everyone else's servers
 * Pause/Resume at any time
-* Works in the browser (~6.5KB)
+* Works in the browser (~4.2KB not gzipped)
 
 ```js
 // Will work with any similar module, not just "request"
@@ -34,10 +34,12 @@ setTimeout(queue.resume, 5000);
 
 ## Installation
 
-[Node.js](http://nodejs.org/) `>= 0.10` is required; `< 4.0` will need an `Object.assign` polyfill. To install, type this at the command line:
+[Node.js](http://nodejs.org/) `>= 4` is required. To install, type this at the command line:
 ```shell
 npm install limited-request-queue
 ```
+
+Note: for use in a web browser, you will likely need [`Object.assign`](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign) and [`URL`](https://developer.mozilla.org/en/docs/Web/API/URL/URL) polyfills for maximum coverage.
 
 
 ## Constructor
@@ -48,64 +50,64 @@ new RequestQueue(options, handlers);
 
 ## Methods
 
-### .dequeue(id)
+### `.dequeue(id)`
 Removes a queue item from the queue. Use of this function is likely not needed as items are auto-dequeued when their turn is reached. Returns `true` on success or an `Error` on failure.
 
-### .enqueue(input)
+### `.enqueue(input)`
 Adds a URL to the queue. `input` can either be a URL `String` or an `Object`. Returns a queue ID on success or an `Error` on failure.
 
 If `input` is an `Object`, it will acccept the following keys:
 
-* `url`: a URL `String` or [`url.parse()`](https://nodejs.org/api/url.html#url_url_parse_urlstr_parsequerystring_slashesdenotehost)-compatible `Object`.
+* `url`: a URL `String` or [`URL`](https://developer.mozilla.org/en/docs/Web/API/URL/)-compatible `Object`.
 * `data`: additional data to be stored in the queue item.
 * `id`: a unique ID (`String` or `Number`). If not defined, one will be generated.
 
-### .length()
-Returns the total number of items in the queue, active and non-active.
+### `.length()`
+Returns the total number of items in the queue, active and inactive.
 
-### .numActive()
+### `.numActive()`
 Returns the number of items whose requests are currently in progress.
 
-### .numQueued()
+### `.numQueued()`
 Returns the number of items that have not yet made requests.
 
-### .pause()
+### `.pause()`
 Pauses the queue, but will not pause any active requests.
 
-### .resume()
+### `.resume()`
 Resumes the queue.
 
 
 ## Options
 
-### options.ignorePorts
+### `options.ignorePorts`
 Type: `Boolean`  
 Default value: `true`  
 Whether or not to treat identical hosts of different ports as a single concurrent group. **Example:** when `true`, http://mywebsite.com:80 and http://mywebsite.com:8080 may not have outgoing connections at the same time, but http://mywebsite.com:80 and http://yourwebsite.com:8080 will.
 
-### options.ignoreSchemes
+### `options.ignoreSchemes`
 Type: `Boolean`  
 Default value: `true`  
 Whether or not to treat identical hosts of different schemes/protocols as a single concurrent group. **Example:** when `true`, http://mywebsite.com and https://mywebsite.com may not have outgoing connections at the same time, but http://mywebsite.com and https://yourwebsite.com will.
 
-### options.ignoreSubdomains
+### `options.ignoreSubdomains`
 Type: `Boolean`  
 Default value: `true`  
 Whether or not to treat identical hosts of different subdomains as a single concurrent group. **Example:** when `true`, http://mywebsite.com and http://www.mywebsite.com may not have outgoing connections at the same time, but http://mywebsite.com and http://www.yourwebsite.com will.
 
 This option is not available in the browser version (due to extreme file size).
 
-### options.maxSockets
+### `options.maxSockets`
 Type: `Number`  
 Default value: `Infinity`  
 The maximum number of connections allowed at any given time. A value of `0` will prevent anything from going out. A value of `Infinity` will provide no concurrency limiting.
 
-### options.maxSocketsPerHost
+### `options.maxSocketsPerHost`
 Type: `Number`  
 Default value: `1`  
 The maximum number of connections per host allowed at any given time. A value of `0` will prevent anything from going out. A value of `Infinity` will provide no per-host concurrency limiting.
 
-### options.rateLimit
+### `options.rateLimit`
 Type: `Number`  
 Default value: `0`  
 The number of milliseconds to wait before each request. For a typical rate limiter, also set `maxSockets` to `1`.
@@ -113,10 +115,10 @@ The number of milliseconds to wait before each request. For a typical rate limit
 
 ## Handlers
 
-### handlers.end
+### `handlers.end`
 Called when the last item in the queue has been completed.
 
-### handlers.item
+### `handlers.item`
 Called when a queue item's turn has been reached. Arguments are: `input`, `done`.
 
 

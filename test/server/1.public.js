@@ -1,7 +1,9 @@
 "use strict";
-var utils = require("./utils");
+var helpers = require("./helpers");
+var RequestQueue = require("../../lib");
 
 var expect = require("chai").expect;
+var URL = require("whatwg-url").URL;
 var urllib = require("url");
 
 
@@ -10,48 +12,47 @@ describe("Public API", function()
 {
 	describe("enqueue() / dequeue() / length()", function()
 	{
-		it("valid URLs should be enqueued", function(done)
+		it("enqueues valid URLs", function()
 		{
-			var queue = new utils.RequestQueue(utils.options());
+			var queue = new RequestQueue(helpers.options());
 			
 			// Prevent first queued item from immediately starting (and thus being auto-dequeued)
 			queue.pause();
 			
 			[
-				utils.urls[0],
-				{ url:utils.urls[0] },
-				{ url:urllib.parse(utils.urls[0]) }
+				helpers.urls[0],
+				{ url:helpers.urls[0] },
+				{ url:urllib.parse(helpers.urls[0]) },
+				{ url:new URL(helpers.urls[0]) }
 				
-			].forEach( function(url)
+			].forEach(url =>
 			{
 				expect( queue.enqueue(url) ).to.be.a("number");
 			});
 			
-			expect( queue.length() ).to.equal(3);
-			done();
+			expect( queue.length() ).to.equal(4);
 		});
 		
 		
 		
-		it("valid IDs should be dequeued", function(done)
+		it("dequeues valid IDs", function()
 		{
-			var queue = new utils.RequestQueue(utils.options());
+			var queue = new RequestQueue(helpers.options());
 			
 			// Prevent first queued item from immediately starting (and thus being auto-dequeued)
 			queue.pause();
 			
-			var id = queue.enqueue(utils.urls[0]);
+			var id = queue.enqueue(helpers.urls[0]);
 			
 			expect( queue.dequeue(id) ).to.be.true;
 			expect( queue.length() ).to.equal(0);
-			done();
 		});
 		
 		
 		
-		it("erroneous URLs should be reported with enqueue()", function(done)
+		it("rejects and does not enqueue erroneous URLs", function()
 		{
-			var queue = new utils.RequestQueue(utils.options());
+			var queue = new RequestQueue(helpers.options());
 			
 			// Prevent first queued item from immediately starting (and thus being auto-dequeued)
 			queue.pause();
@@ -63,32 +64,28 @@ describe("Public API", function()
 				{ url:urllib.parse("/path/") },
 				{ url:{} }
 				
-			].forEach( function(url)
+			].forEach(url =>
 			{
 				expect( queue.enqueue(url) ).to.be.instanceOf(Error);
 				expect( queue.length() ).to.equal(0);
 			});
-			
-			done();
 		});
 		
 		
 		
-		it("erroneous IDs should be reported with enqueue() and dequeue()", function(done)
+		it("rejects and neither enqueues nor dequeues invalid IDs", function()
 		{
-			var queue = new utils.RequestQueue(utils.options());
+			var queue = new RequestQueue(helpers.options());
 			
 			// Prevent first queued item from immediately starting (and thus being auto-dequeued)
 			queue.pause();
 			
-			expect( queue.enqueue({id:123, url:utils.urls[0]}) ).to.not.be.instanceOf(Error);
-			expect( queue.enqueue({id:123, url:utils.urls[0]}) ).to.be.instanceOf(Error);
+			expect( queue.enqueue({id:123, url:helpers.urls[0]}) ).to.not.be.instanceOf(Error);
+			expect( queue.enqueue({id:123, url:helpers.urls[0]}) ).to.be.instanceOf(Error);
 			
 			expect( queue.dequeue(123456) ).to.be.instanceOf(Error);
 			
 			expect( queue.length() ).to.equal(1);
-			
-			done();
 		});
 	});
 	
@@ -98,29 +95,29 @@ describe("Public API", function()
 	{
 		describe("item", function()
 		{
-			it("should work", function(done)
+			it("works", function(done)
 			{
 				var count = 0;
-				var queue = new utils.RequestQueue(utils.options(),
+				var queue = new RequestQueue(helpers.options(),
 				{
 					item: function(input, itemDone)
 					{
-						if (++count >= utils.urls.length)
+						if (++count >= helpers.urls.length)
 						{
 							done();
 						}
 					}
 				});
 				
-				utils.urls.forEach(queue.enqueue, queue);
+				helpers.urls.forEach(queue.enqueue, queue);
 			});
 			
 			
 			
-			it("should support custom IDs and custom data", function(done)
+			it("supports custom IDs and custom data", function(done)
 			{
 				var count = 0;
-				var queue = new utils.RequestQueue(utils.options(),
+				var queue = new RequestQueue(helpers.options(),
 				{
 					item: function(input, itemDone)
 					{
@@ -129,21 +126,21 @@ describe("Public API", function()
 							case 1:
 							{
 								expect(input.id).to.equal(0);
-								expect(input.url).to.equal(utils.urls[0]);
+								expect(input.url).to.equal(helpers.urls[0]);
 								expect(input.data).to.equal(1);
 								break;
 							}
 							case 2:
 							{
 								expect(input.id).to.equal(1);
-								expect(input.url).to.equal(utils.urls[1]);
+								expect(input.url).to.equal(helpers.urls[1]);
 								expect(input.data).to.equal(2);
 								break;
 							}
 							case 3:
 							{
 								expect(input.id).to.equal(2);
-								expect(input.url).to.equal(utils.urls[2]);
+								expect(input.url).to.equal(helpers.urls[2]);
 								expect(input.data).to.equal(3);
 								done();
 								break;
@@ -152,16 +149,16 @@ describe("Public API", function()
 					}
 				});
 				
-				queue.enqueue({ id:0, url:utils.urls[0], data:1 });
-				queue.enqueue({ id:1, url:utils.urls[1], data:2 });
-				queue.enqueue({ id:2, url:utils.urls[2], data:3 });
+				queue.enqueue({ id:0, url:helpers.urls[0], data:1 });
+				queue.enqueue({ id:1, url:helpers.urls[1], data:2 });
+				queue.enqueue({ id:2, url:helpers.urls[2], data:3 });
 			});
 			
 			
 			
-			it("should not be called with erroneous URLs", function(done)
+			it("is not called with erroneous URLs", function(done)
 			{
-				var queue = new utils.RequestQueue(utils.options(),
+				var queue = new RequestQueue(helpers.options(),
 				{
 					item: function(input, itemDone)
 					{
@@ -176,18 +173,18 @@ describe("Public API", function()
 			
 			
 			
-			it("should not be called with erroneous custom IDs", function(done)
+			it("is not called with erroneous custom IDs", function(done)
 			{
 				var count = 0;
 				
-				var queue = new utils.RequestQueue(utils.options(),
+				var queue = new RequestQueue(helpers.options(),
 				{
 					item: function(input, itemDone)
 					{
 						if (++count == 1)
 						{
 							// Simulate a remote connection
-							setTimeout(done, utils.delay);
+							setTimeout(done, helpers.delay);
 						}
 						else
 						{
@@ -196,8 +193,8 @@ describe("Public API", function()
 					}
 				});
 				
-				queue.enqueue({id:123, url:utils.urls[0]});
-				queue.enqueue({id:123, url:utils.urls[0]});
+				queue.enqueue({id:123, url:helpers.urls[0]});
+				queue.enqueue({id:123, url:helpers.urls[0]});
 				queue.dequeue(123456);
 			});
 		});
@@ -206,13 +203,13 @@ describe("Public API", function()
 		
 		describe("end", function()
 		{
-			it("should work", function(done)
+			it("works", function(done)
 			{
-				var queue = new utils.RequestQueue(utils.options(),
+				var queue = new RequestQueue(helpers.options(),
 				{
 					item: function(input, itemDone)
 					{
-						setTimeout(itemDone, utils.delay);
+						setTimeout(itemDone, helpers.delay);
 					},
 					end: function()
 					{
@@ -220,20 +217,20 @@ describe("Public API", function()
 					}
 				});
 				
-				utils.urls.forEach(queue.enqueue, queue);
+				helpers.urls.forEach(queue.enqueue, queue);
 			});
 			
 			
 			
-			it("should be called when last item is dequeued", function(done)
+			it("is called when last item is dequeued", function(done)
 			{
-				var queue = new utils.RequestQueue(utils.options(),
+				var queue = new RequestQueue(helpers.options(),
 				{
 					end: function()
 					{
 						// Wait for `dequeued` to receive its value
 						// since everything here is performed synchronously
-						setImmediate( function()
+						setImmediate( () =>
 						{
 							expect(dequeued).to.be.true;
 							done();
@@ -244,15 +241,15 @@ describe("Public API", function()
 				// Prevent first queued item from immediately starting (and thus being auto-dequeued)
 				queue.pause();
 				
-				var id = queue.enqueue(utils.urls[0]);
+				var id = queue.enqueue(helpers.urls[0]);
 				var dequeued = queue.dequeue(id);
 			});
 			
 			
 			
-			it("should not be called simply by calling resume()", function(done)
+			it("is not called simply by calling resume()", function(done)
 			{
-				var queue = new utils.RequestQueue(utils.options(),
+				var queue = new RequestQueue(helpers.options(),
 				{
 					end: function()
 					{
@@ -262,14 +259,14 @@ describe("Public API", function()
 				
 				queue.resume();
 				
-				setTimeout(done, utils.delay*2);
+				setTimeout(done, helpers.delay*2);
 			});
 			
 			
 			
-			it("should not be called on erroneous dequeue", function(done)
+			it("is not called on erroneous dequeue", function(done)
 			{
-				var queue = new utils.RequestQueue(utils.options(),
+				var queue = new RequestQueue(helpers.options(),
 				{
 					end: function()
 					{
@@ -279,7 +276,7 @@ describe("Public API", function()
 				
 				queue.dequeue("fakeid");
 				
-				setTimeout(done, utils.delay*2);
+				setTimeout(done, helpers.delay*2);
 			});
 		});
 	});
@@ -288,15 +285,15 @@ describe("Public API", function()
 	
 	describe("pause() / resume()", function()
 	{
-		it("should work", function(done)
+		it("works", function(done)
 		{
 			var count = 0;
 			var resumed = false;
 			
-			utils.testUrls(utils.urls, utils.options(), function(results)
+			helpers.testUrls(helpers.urls, helpers.options(), function(results)
 			{
 				expect(resumed).to.be.true;
-				expect(results).to.deep.equal(utils.urls);
+				expect(results).to.deep.equal(helpers.urls);
 				done();
 			},
 			function(input, queue)
@@ -306,12 +303,12 @@ describe("Public API", function()
 					queue.pause();
 					
 					// Wait longer than queue should take if not paused+resumed
-					setTimeout( function()
+					setTimeout( () =>
 					{
 						resumed = true;
 						queue.resume();
 						
-					}, utils.expectedSyncMinDuration());
+					}, helpers.expectedSyncMinDuration());
 				}
 			});
 		});
@@ -321,13 +318,13 @@ describe("Public API", function()
 	
 	describe("numActive()", function()
 	{
-		it("should work", function(done)
+		it("works", function(done)
 		{
-			var queue = new utils.RequestQueue(utils.options(),
+			var queue = new RequestQueue(helpers.options(),
 			{
 				item: function(input, itemDone)
 				{
-					setTimeout(itemDone, utils.delay);
+					setTimeout(itemDone, helpers.delay);
 				},
 				end: function()
 				{
@@ -336,9 +333,9 @@ describe("Public API", function()
 				}
 			});
 			
-			utils.urls.forEach(queue.enqueue, queue);
+			helpers.urls.forEach(queue.enqueue, queue);
 			
-			expect( queue.numActive() ).to.equal(utils.urls.length);
+			expect( queue.numActive() ).to.equal(helpers.urls.length);
 		});
 	});
 	
@@ -346,13 +343,13 @@ describe("Public API", function()
 	
 	describe("numQueued()", function()
 	{
-		it("should work", function(done)
+		it("works", function(done)
 		{
-			var queue = new utils.RequestQueue(utils.options(),
+			var queue = new RequestQueue(helpers.options(),
 			{
 				item: function(input, itemDone)
 				{
-					setTimeout(itemDone, utils.delay);
+					setTimeout(itemDone, helpers.delay);
 				},
 				end: function()
 				{
@@ -361,7 +358,7 @@ describe("Public API", function()
 				}
 			});
 			
-			utils.urls.forEach(queue.enqueue, queue);
+			helpers.urls.forEach(queue.enqueue, queue);
 			
 			expect( queue.numQueued() ).to.equal(0);
 		});
@@ -373,11 +370,11 @@ describe("Public API", function()
 	{
 		describe("all disabled", function()
 		{
-			it("should work", function(done)
+			it("works", function(done)
 			{
-				utils.testUrls(utils.urls, utils.options(), function(results)
+				helpers.testUrls(helpers.urls, helpers.options(), function(results)
 				{
-					expect(results).to.deep.equal(utils.urls);
+					expect(results).to.deep.equal(helpers.urls);
 					done();
 				});
 			});
@@ -387,98 +384,87 @@ describe("Public API", function()
 		
 		describe("maxSockets", function()
 		{
-			before( function(done)
-			{
-				utils.clearDurations();
-				done();
-			});
+			before( () => helpers.clearDurations() );
 			
 			
 			
 			describe("=0", function()
 			{
-				it("should do nothing", function(done)
+				it("does nothing", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ maxSockets:0 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ maxSockets:0 }), function(results)
 					{
 						done( new Error("this should not have been called") );
 					});
 					
-					setTimeout( function()
-					{
-						done();
-					}, utils.expectedSyncMinDuration());
+					setTimeout( () => done(), helpers.expectedSyncMinDuration() );
 				});
 			});
 			
 			
 			
-			[1,2,3,4,Infinity].forEach( function(value)
+			[1,2,3,4,Infinity].forEach(value =>
 			{
 				describe("="+value, function()
 				{
-					before( function(done)
+					before( () => helpers.addDurationGroup() );
+					
+					
+					
+					it("works", function(done)
 					{
-						utils.addDurationGroup();
-						done();
-					});
-					
-					
-					
-					it("should work", function(done)
-					{
-						utils.testUrls(utils.urls, utils.options({ maxSockets:value }), function(results, duration)
+						helpers.testUrls(helpers.urls, helpers.options({ maxSockets:value }), function(results, duration)
 						{
-							utils.compareDurations(duration, function(prevGroupDuration)
+							helpers.compareDurations(duration, function(prevGroupDuration)
 							{
 								expect(duration).to.be.below(prevGroupDuration);
 							});
 							
-							expect(results).to.deep.equal(utils.urls);
+							expect(results).to.deep.equal(helpers.urls);
 							done();
 						});
 					});
 					
 					
 					
-					it("should work with ignorePorts=true", function(done)
+					it("supports ignorePorts=true", function(done)
 					{
-						utils.testUrls(utils.urls, utils.options({ ignorePorts:true, maxSockets:value }), function(results)
+						helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, maxSockets:value }), function(results)
 						{
-							expect(results).to.deep.equal(utils.urls);
+							expect(results).to.deep.equal(helpers.urls);
 							done();
 						});
 					});
 					
 					
 					
-					it("should work with ignoreSchemes=true", function(done)
+					it("supports ignoreSchemes=true", function(done)
 					{
-						utils.testUrls(utils.urls, utils.options({ ignoreSchemes:true, maxSockets:value }), function(results)
+						helpers.testUrls(helpers.urls, helpers.options({ ignoreSchemes:true, maxSockets:value }), function(results)
 						{
-							expect(results).to.deep.equal(utils.urls);
+							expect(results).to.deep.equal(helpers.urls);
 							done();
 						});
 					});
 					
 					
 					
-					it("should work with ignoreSubdomains=true", function(done)
+					it("supports ignoreSubdomains=true", function(done)
 					{
-						utils.testUrls(utils.urls, utils.options({ ignoreSubdomains:true, maxSockets:value }), function(results)
+						helpers.testUrls(helpers.urls, helpers.options({ ignoreSubdomains:true, maxSockets:value }), function(results)
 						{
-							expect(results).to.deep.equal(utils.urls);
+							expect(results).to.deep.equal(helpers.urls);
 							done();
 						});
 					});
 					
 					
 					
-					it("should work with all boolean options true", function(done)
+					it("supports all boolean options true", function(done)
 					{
-						utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSockets:value }), function(results)
+						helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSockets:value }), function(results)
 						{
-							expect(results).to.deep.equal(utils.urls);
+							expect(results).to.deep.equal(helpers.urls);
 							done();
 						});
 					});
@@ -490,27 +476,20 @@ describe("Public API", function()
 		
 		describe("maxSocketsPerHost", function()
 		{
-			before( function(done)
-			{
-				utils.clearDurations();
-				done();
-			});
+			before( () => helpers.clearDurations() );
 			
 			
 			
 			describe("=0", function()
 			{
-				it("should do nothing", function(done)
+				it("does nothing", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ maxSocketsPerHost:0 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ maxSocketsPerHost:0 }), function(results)
 					{
 						done( new Error("this should not have been called") );
 					});
 					
-					setTimeout( function()
-					{
-						done();
-					}, utils.expectedSyncMinDuration());
+					setTimeout( () => done(), helpers.expectedSyncMinDuration() );
 				});
 			});
 			
@@ -518,19 +497,15 @@ describe("Public API", function()
 			
 			describe("=1", function()
 			{
-				before( function(done)
+				before( () => helpers.addDurationGroup() );
+				
+				
+				
+				it("works", function(done)
 				{
-					utils.addDurationGroup();
-					done();
-				});
-				
-				
-				
-				it("should work", function(done)
-				{
-					utils.testUrls(utils.urls, utils.options({ maxSocketsPerHost:1 }), function(results, duration)
+					helpers.testUrls(helpers.urls, helpers.options({ maxSocketsPerHost:1 }), function(results, duration)
 					{
-						utils.compareDurations(duration, function(prevGroupDuration)
+						helpers.compareDurations(duration, function(prevGroupDuration)
 						{
 							expect(duration).to.be.below(prevGroupDuration);
 						});
@@ -566,9 +541,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with ignorePorts=true", function(done)
+				it("supports ignorePorts=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignorePorts:true, maxSocketsPerHost:1 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, maxSocketsPerHost:1 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -604,9 +579,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with ignoreSchemes=true", function(done)
+				it("supports ignoreSchemes=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignoreSchemes:true, maxSocketsPerHost:1 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignoreSchemes:true, maxSocketsPerHost:1 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -646,9 +621,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with ignoreSubdomains=true", function(done)
+				it("supports ignoreSubdomains=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignoreSubdomains:true, maxSocketsPerHost:1 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignoreSubdomains:true, maxSocketsPerHost:1 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -685,9 +660,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with all boolean options true", function(done)
+				it("supports all boolean options true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:1 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:1 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -724,19 +699,15 @@ describe("Public API", function()
 			
 			describe("=2", function()
 			{
-				before( function(done)
+				before( () => helpers.addDurationGroup() );
+				
+				
+				
+				it("works", function(done)
 				{
-					utils.addDurationGroup();
-					done();
-				});
-				
-				
-				
-				it("should work", function(done)
-				{
-					utils.testUrls(utils.urls, utils.options({ maxSocketsPerHost:2 }), function(results, duration)
+					helpers.testUrls(helpers.urls, helpers.options({ maxSocketsPerHost:2 }), function(results, duration)
 					{
-						utils.compareDurations(duration, function(prevGroupDuration)
+						helpers.compareDurations(duration, function(prevGroupDuration)
 						{
 							expect(duration).to.be.below(prevGroupDuration);
 						});
@@ -772,9 +743,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with ignorePorts=true", function(done)
+				it("supports ignorePorts=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignorePorts:true, maxSocketsPerHost:2 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, maxSocketsPerHost:2 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -808,9 +779,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with ignoreSchemes=true", function(done)
+				it("supports ignoreSchemes=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignoreSchemes:true, maxSocketsPerHost:2 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignoreSchemes:true, maxSocketsPerHost:2 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -844,9 +815,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with ignoreSubdomains=true", function(done)
+				it("supports ignoreSubdomains=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignoreSubdomains:true, maxSocketsPerHost:2 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignoreSubdomains:true, maxSocketsPerHost:2 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -881,9 +852,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with all boolean options true", function(done)
+				it("supports all boolean options true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:2 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:2 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -923,19 +894,15 @@ describe("Public API", function()
 			
 			describe("=3", function()
 			{
-				before( function(done)
+				before( () => helpers.addDurationGroup() );
+				
+				
+				
+				it("works", function(done)
 				{
-					utils.addDurationGroup();
-					done();
-				});
-				
-				
-				
-				it("should work", function(done)
-				{
-					utils.testUrls(utils.urls, utils.options({ maxSocketsPerHost:3 }), function(results, duration)
+					helpers.testUrls(helpers.urls, helpers.options({ maxSocketsPerHost:3 }), function(results, duration)
 					{
-						utils.compareDurations(duration, function(prevGroupDuration)
+						helpers.compareDurations(duration, function(prevGroupDuration)
 						{
 							expect(duration).to.be.within(prevGroupDuration-20, prevGroupDuration+20);
 						});
@@ -972,9 +939,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with ignorePorts=true", function(done)
+				it("supports ignorePorts=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignorePorts:true, maxSocketsPerHost:3 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, maxSocketsPerHost:3 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -1010,9 +977,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with ignoreSchemes=true", function(done)
+				it("supports ignoreSchemes=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignoreSchemes:true, maxSocketsPerHost:3 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignoreSchemes:true, maxSocketsPerHost:3 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -1049,9 +1016,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with ignoreSubdomains=true", function(done)
+				it("supports ignoreSubdomains=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignoreSubdomains:true, maxSocketsPerHost:3 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignoreSubdomains:true, maxSocketsPerHost:3 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -1088,9 +1055,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with all boolean options true", function(done)
+				it("supports all boolean options true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:3 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:3 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -1131,33 +1098,29 @@ describe("Public API", function()
 			
 			describe("=4", function()
 			{
-				before( function(done)
+				before( () => helpers.addDurationGroup() );
+				
+				
+				
+				it("works", function(done)
 				{
-					utils.addDurationGroup();
-					done();
-				});
-				
-				
-				
-				it("should work", function(done)
-				{
-					utils.testUrls(utils.urls, utils.options({ maxSocketsPerHost:4 }), function(results, duration)
+					helpers.testUrls(helpers.urls, helpers.options({ maxSocketsPerHost:4 }), function(results, duration)
 					{
-						utils.compareDurations(duration, function(prevGroupDuration)
+						helpers.compareDurations(duration, function(prevGroupDuration)
 						{
 							expect(duration).to.be.below(prevGroupDuration);
 						});
 						
-						expect(results).to.deep.equal(utils.urls);
+						expect(results).to.deep.equal(helpers.urls);
 						done();
 					});
 				});
 				
 				
 				
-				it("should work with ignorePorts=true", function(done)
+				it("supports ignorePorts=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignorePorts:true, maxSocketsPerHost:4 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, maxSocketsPerHost:4 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -1190,20 +1153,20 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with ignoreSchemes=true", function(done)
+				it("supports ignoreSchemes=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignoreSchemes:true, maxSocketsPerHost:4 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignoreSchemes:true, maxSocketsPerHost:4 }), function(results)
 					{
-						expect(results).to.deep.equal(utils.urls);
+						expect(results).to.deep.equal(helpers.urls);
 						done();
 					});
 				});
 				
 				
 				
-				it("should work with ignoreSubdomains=true", function(done)
+				it("supports ignoreSubdomains=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignoreSubdomains:true, maxSocketsPerHost:4 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignoreSubdomains:true, maxSocketsPerHost:4 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -1236,9 +1199,9 @@ describe("Public API", function()
 				
 				
 				
-				it("should work with all boolean options true", function(done)
+				it("supports all boolean options true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:4 }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:4 }), function(results)
 					{
 						expect(results).to.deep.equal(
 						[
@@ -1274,68 +1237,64 @@ describe("Public API", function()
 			
 			describe("=Infinity", function()
 			{
-				before( function(done)
+				before( () => helpers.addDurationGroup() );
+				
+				
+				
+				it("works", function(done)
 				{
-					utils.addDurationGroup();
-					done();
-				});
-				
-				
-				
-				it("should work", function(done)
-				{
-					utils.testUrls(utils.urls, utils.options({ maxSocketsPerHost:Infinity }), function(results, duration)
+					helpers.testUrls(helpers.urls, helpers.options({ maxSocketsPerHost:Infinity }), function(results, duration)
 					{
-						utils.compareDurations(duration, function(prevGroupDuration)
+						helpers.compareDurations(duration, function(prevGroupDuration)
 						{
 							expect(duration).to.be.within(prevGroupDuration-20, prevGroupDuration+20);
 						});
 						
-						expect(results).to.deep.equal(utils.urls);
+						expect(results).to.deep.equal(helpers.urls);
 						done();
 					});
 				});
 				
 				
 				
-				it("should work with ignorePorts=true", function(done)
+				it("supports ignorePorts=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignorePorts:true, maxSocketsPerHost:Infinity }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, maxSocketsPerHost:Infinity }), function(results)
 					{
-						expect(results).to.deep.equal(utils.urls);
+						expect(results).to.deep.equal(helpers.urls);
 						done();
 					});
 				});
 				
 				
 				
-				it("should work with ignoreSchemes=true", function(done)
+				it("supports ignoreSchemes=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignoreSchemes:true, maxSocketsPerHost:Infinity }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignoreSchemes:true, maxSocketsPerHost:Infinity }), function(results)
 					{
-						expect(results).to.deep.equal(utils.urls);
+						expect(results).to.deep.equal(helpers.urls);
 						done();
 					});
 				});
 				
 				
 				
-				it("should work with ignoreSubdomains=true", function(done)
+				it("supports ignoreSubdomains=true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignoreSubdomains:true, maxSocketsPerHost:Infinity }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignoreSubdomains:true, maxSocketsPerHost:Infinity }), function(results)
 					{
-						expect(results).to.deep.equal(utils.urls);
+						expect(results).to.deep.equal(helpers.urls);
 						done();
 					});
 				});
 				
 				
 				
-				it("should work with all boolean options true", function(done)
+				it("supports all boolean options true", function(done)
 				{
-					utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:Infinity }), function(results)
+					helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSocketsPerHost:Infinity }), function(results)
 					{
-						expect(results).to.deep.equal(utils.urls);
+						expect(results).to.deep.equal(helpers.urls);
 						done();
 					});
 				});
@@ -1346,60 +1305,60 @@ describe("Public API", function()
 		
 		describe("rateLimit=50", function()
 		{
-			it("should work", function(done)
+			it("works", function(done)
 			{
-				utils.testUrls(utils.urls, utils.options({ rateLimit:50 }), function(results, duration)
+				helpers.testUrls(helpers.urls, helpers.options({ rateLimit:50 }), function(results, duration)
 				{
 					expect(duration).to.be.at.least(50);
-					expect(results).to.deep.equal(utils.urls);
+					expect(results).to.deep.equal(helpers.urls);
 					done();
 				});
 			});
 			
 			
 			
-			it("should work with ignorePorts=true", function(done)
+			it("supports ignorePorts=true", function(done)
 			{
-				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, rateLimit:50 }), function(results, duration)
+				helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, rateLimit:50 }), function(results, duration)
 				{
 					expect(duration).to.be.at.least(50);
-					expect(results).to.deep.equal(utils.urls);
+					expect(results).to.deep.equal(helpers.urls);
 					done();
 				});
 			});
 			
 			
 			
-			it("should work with ignoreSchemes=true", function(done)
+			it("supports ignoreSchemes=true", function(done)
 			{
-				utils.testUrls(utils.urls, utils.options({ ignoreSchemes:true, rateLimit:50 }), function(results, duration)
+				helpers.testUrls(helpers.urls, helpers.options({ ignoreSchemes:true, rateLimit:50 }), function(results, duration)
 				{
 					expect(duration).to.be.at.least(50);
-					expect(results).to.deep.equal(utils.urls);
+					expect(results).to.deep.equal(helpers.urls);
 					done();
 				});
 			});
 			
 			
 			
-			it("should work with ignoreSubdomains=true", function(done)
+			it("supports ignoreSubdomains=true", function(done)
 			{
-				utils.testUrls(utils.urls, utils.options({ ignoreSubdomains:true, rateLimit:50 }), function(results, duration)
+				helpers.testUrls(helpers.urls, helpers.options({ ignoreSubdomains:true, rateLimit:50 }), function(results, duration)
 				{
 					expect(duration).to.be.at.least(50);
-					expect(results).to.deep.equal(utils.urls);
+					expect(results).to.deep.equal(helpers.urls);
 					done();
 				});
 			});
 			
 			
 			
-			it("should work with all boolean options true", function(done)
+			it("supports all boolean options true", function(done)
 			{
-				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, rateLimit:50 }), function(results, duration)
+				helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, rateLimit:50 }), function(results, duration)
 				{
 					expect(duration).to.be.at.least(50);
-					expect(results).to.deep.equal(utils.urls);
+					expect(results).to.deep.equal(helpers.urls);
 					done();
 				});
 			});
@@ -1409,13 +1368,13 @@ describe("Public API", function()
 		
 		describe("all boolean options true, maxSockets=2, maxSocketsPerHost=1, rateLimit=50", function()
 		{
-			it("should work", function(done)
+			it("works", function(done)
 			{
 				this.timeout(0);
 				
-				utils.testUrls(utils.urls, utils.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSockets:2, maxSocketsPerHost:1, rateLimit:50 }), function(results, duration)
+				helpers.testUrls(helpers.urls, helpers.options({ ignorePorts:true, ignoreSchemes:true, ignoreSubdomains:true, maxSockets:2, maxSocketsPerHost:1, rateLimit:50 }), function(results, duration)
 				{
-					expect(duration).to.be.at.least( (utils.urls.length-4) * (50 + utils.delay) );
+					expect(duration).to.be.at.least( (helpers.urls.length-4) * (50 + helpers.delay) );
 					expect(results).to.deep.equal(
 					[
 						"https://www.google.com/",
@@ -1456,9 +1415,9 @@ describe("Public API", function()
 		
 		describe("default options", function()
 		{
-			it("should work", function(done)
+			it("works", function(done)
 			{
-				utils.testUrls(utils.urls, undefined, function(results)
+				helpers.testUrls(helpers.urls, undefined, function(results)
 				{
 					expect(results).to.deep.equal(
 					[
@@ -1496,7 +1455,7 @@ describe("Public API", function()
 	
 	describe("Test suite functions", function()
 	{
-		it("utils.testUrls should report erroneous URLs", function(done)
+		it("helpers.testUrls reports erroneous URLs", function(done)
 		{
 			var urls = [
 				"https://www.google.com/",
@@ -1504,7 +1463,7 @@ describe("Public API", function()
 				"http://www.google.com/"
 			];
 			
-			utils.testUrls(urls, utils.options(), function(results)
+			helpers.testUrls(urls, helpers.options(), function(results)
 			{
 				expect(results[0]).to.be.instanceOf(Error);
 				expect(results[1]).to.equal("https://www.google.com/");

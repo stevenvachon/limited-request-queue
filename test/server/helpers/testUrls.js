@@ -1,10 +1,7 @@
 "use strict";
-var RequestQueue = require("../../lib");
-
-require("object.assign").shim();
+var RequestQueue = require("../../../lib");
 
 var delay = 18;	// long enough without trying everyone's patience
-var durations = [];
 var _urls = 
 [
 	"https://www.google.com/",
@@ -40,36 +37,6 @@ var _urls =
 
 
 
-function addDurationGroup()
-{
-	durations.push([]);
-}
-
-
-
-function clearDurations()
-{
-	durations.length = 0;
-}
-
-
-
-function compareDurations(duration, callback)
-{
-	var curGroup = durations[ durations.length-1 ];
-	var prevGroupDuration;
-	
-	curGroup.push(duration);
-	
-	if (durations.length > 1)
-	{
-		prevGroupDuration = durations[durations.length-2][ curGroup.length-1 ];
-		callback(prevGroupDuration);
-	}
-}
-
-
-
 function doneCheck(result, results, urls, startTime, callback)
 {
 	var duration;
@@ -91,26 +58,6 @@ function expectedSyncMinDuration()
 
 
 
-function options(overrides)
-{
-	return Object.assign
-	(
-		{},
-		{
-			defaultPorts: {ftp:21, http:80, https:443},
-			ignorePorts: false,
-			ignoreSchemes: false,
-			ignoreSubdomains: false,
-			maxSockets: Infinity,
-			maxSocketsPerHost: Infinity,
-			rateLimit: 0
-		},
-		overrides
-	);
-}
-
-
-
 function testUrls(urls, libOptions, completeCallback, eachCallback)
 {
 	var queued;
@@ -127,7 +74,7 @@ function testUrls(urls, libOptions, completeCallback, eachCallback)
 			}
 			
 			// Simulate a remote connection
-			setTimeout( function()
+			setTimeout( () =>
 			{
 				done();
 				doneCheck(input.url, results, urls, startTime, completeCallback);
@@ -136,7 +83,7 @@ function testUrls(urls, libOptions, completeCallback, eachCallback)
 		}
 	});
 	
-	urls.forEach( function(url)
+	urls.forEach(url =>
 	{
 		var error = queue.enqueue(url);
 		var input;
@@ -160,13 +107,8 @@ function testUrls(urls, libOptions, completeCallback, eachCallback)
 
 module.exports = 
 {
-	addDurationGroup: addDurationGroup,
-	clearDurations: clearDurations,
-	compareDurations: compareDurations,
 	delay: delay,
 	expectedSyncMinDuration: expectedSyncMinDuration,
-	options: options,
-	RequestQueue: RequestQueue,
 	testUrls: testUrls,
 	urls: _urls
 };

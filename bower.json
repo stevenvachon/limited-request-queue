@@ -5,7 +5,7 @@
   "authors": [
     "Steven Vachon <contact@svachon.com>"
   ],
-  "description": "Interactively manage concurrency for AJAX requests.",
+  "description": "Interactively manage concurrency for outbound requests.",
   "main": "browser/requestqueue.js",
   "keywords": [
     "background",
@@ -18,7 +18,6 @@
     "request",
     "throttle"
   ],
-  "license": "MIT",
   "ignore": [
     "bower_components",
     "lib",

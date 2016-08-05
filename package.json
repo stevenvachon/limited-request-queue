@@ -1,7 +1,7 @@
 {
   "name": "limited-request-queue",
-  "description": "Interactively manage concurrency for outgoing requests.",
-  "version": "2.0.0",
+  "description": "Interactively manage concurrency for outbound requests.",
+  "version": "3.0.0",
   "license": "MIT",
   "homepage": "https://github.com/stevenvachon/limited-request-queue",
   "author": {
@@ -19,26 +19,32 @@
   },
   "dependencies": {
     "is-browser": "^2.0.1",
-    "parse-domain": "~0.2.0"
+    "is-string": "^1.0.4",
+    "parse-domain": "~0.2.1",
+    "whatwg-url": "^3.0.0"
   },
   "devDependencies": {
-    "browserify": "^12.0.1",
-    "chai": "^3.4.1",
-    "mocha": "^2.3.4",
-    "mocha-phantomjs": "4.0.1",
-    "object.assign": "^4.0.3",
-    "phantomjs": "1.9.19",
-    "uglify-js": "^2.6.1",
-    "url-parse": "^1.0.5"
+    "browserify": "^13.1.0",
+    "chai": "^3.5.0",
+    "mocha": "^3.0.1",
+    "mocha-phantomjs": "4.1.0",
+    "napa": "^2.3.0",
+    "object.assign": "^4.0.4",
+    "phantomjs-prebuilt": "^2.1.10",
+    "uglify-js": "^2.7.0"
+  },
+  "napa": {
+    "url-polyfill": "git+https://github.com/annevk/url.git"
   },
   "engines": {
-    "node": ">= 0.10"
+    "node": ">= 4"
   },
   "scripts": {
-    "browserify": "browserify lib/ --exclude parse-domain --exclude url --standalone RequestQueue | uglifyjs --compress --mangle -o browser/requestqueue.js",
+    "browserify": "browserify lib/ --exclude parse-domain --exclude whatwg-url --standalone RequestQueue | uglifyjs --compress --mangle -o browser/requestqueue.js",
+    "install": "napa",
+    "test": "npm run test_server && npm run test_browser",
     "test_browser": "npm run browserify && mocha-phantomjs test/browser.html",
-    "test_server": "mocha test/server/ --reporter spec --check-leaks --bail",
-    "test": "npm run test_server && npm run test_browser"
+    "test_server": "mocha test/server/ --reporter spec --check-leaks --bail"
   },
   "files": [
     "lib",
