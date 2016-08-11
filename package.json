@@ -1,7 +1,7 @@
 {
   "name": "limited-request-queue",
   "description": "Interactively manage concurrency for outbound requests.",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "license": "MIT",
   "homepage": "https://github.com/stevenvachon/limited-request-queue",
   "author": {
@@ -26,11 +26,11 @@
   "devDependencies": {
     "browserify": "^13.1.0",
     "chai": "^3.5.0",
-    "mocha": "^3.0.1",
+    "mocha": "^3.0.2",
     "mocha-phantomjs": "4.1.0",
     "napa": "^2.3.0",
     "object.assign": "^4.0.4",
-    "phantomjs-prebuilt": "^2.1.10",
+    "phantomjs-prebuilt": "^2.1.11",
     "uglify-js": "^2.7.0"
   },
   "napa": {
@@ -40,7 +40,7 @@
     "node": ">= 4"
   },
   "scripts": {
-    "browserify": "browserify lib/ --exclude parse-domain --exclude whatwg-url --standalone RequestQueue | uglifyjs --compress --mangle -o browser/requestqueue.js",
+    "browserify": "browserify lib/ --standalone RequestQueue | uglifyjs --compress --mangle -o browser/requestqueue.js",
     "install": "napa",
     "test": "npm run test_server && npm run test_browser",
     "test_browser": "npm run browserify && mocha-phantomjs test/browser.html",

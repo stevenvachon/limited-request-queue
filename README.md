@@ -6,7 +6,7 @@ Features:
 * Concurrency & rate limiting prevents overload on your server
 * Per-Host concurrency limiting prevents overload on everyone else's servers
 * Pause/Resume at any time
-* Works in the browser (~4.2KB not gzipped)
+* Works in the browser (~4.4KB not gzipped)
 
 ```js
 // Will work with any similar module, not just "request"
@@ -54,11 +54,11 @@ new RequestQueue(options, handlers);
 Removes a queue item from the queue. Use of this function is likely not needed as items are auto-dequeued when their turn is reached. Returns `true` on success or an `Error` on failure.
 
 ### `.enqueue(input)`
-Adds a URL to the queue. `input` can either be a URL `String` or an `Object`. Returns a queue ID on success or an `Error` on failure.
+Adds a URL to the queue. `input` can either be a URL `String` or a [`URL`](https://developer.mozilla.org/en/docs/Web/API/URL/)-compatible `Object`. Returns a queue ID on success or an `Error` on failure.
 
 If `input` is an `Object`, it will acccept the following keys:
 
-* `url`: a URL `String` or [`URL`](https://developer.mozilla.org/en/docs/Web/API/URL/)-compatible `Object`.
+* `url`: a URL `String` or `URL`-compatible `Object`.
 * `data`: additional data to be stored in the queue item.
 * `id`: a unique ID (`String` or `Number`). If not defined, one will be generated.
 
