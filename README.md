@@ -54,11 +54,11 @@ new RequestQueue(options, handlers);
 Removes a queue item from the queue. Use of this function is likely not needed as items are auto-dequeued when their turn is reached. Returns `true` on success or an `Error` on failure.
 
 ### `.enqueue(input)`
-Adds a URL to the queue. `input` can either be a URL `String` or a [`URL`](https://developer.mozilla.org/en/docs/Web/API/URL/)-compatible `Object`. Returns a queue ID on success or an `Error` on failure.
+Adds a URL to the queue. `input` can either be a URL `String` or a configuration `Object`. Returns a queue ID on success or an `Error` on failure.
 
-If `input` is an `Object`, it will acccept the following keys:
+If `input` is an `Object`, it will accept the following keys:
 
-* `url`: a URL `String` or `URL`-compatible `Object`.
+* `url`: a URL `String`, [`URL`](https://developer.mozilla.org/en/docs/Web/API/URL/) or [Node URL](https://nodejs.org/api/url.html#url_url_strings_and_url_objects)-compatible `Object`.
 * `data`: additional data to be stored in the queue item.
 * `id`: a unique ID (`String` or `Number`). If not defined, one will be generated.
 

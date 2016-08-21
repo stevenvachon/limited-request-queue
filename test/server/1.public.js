@@ -3,8 +3,8 @@ var helpers = require("./helpers");
 var RequestQueue = require("../../lib");
 
 var expect = require("chai").expect;
+var parseUrl = require("url").parse;
 var URL = require("whatwg-url").URL;
-var urllib = require("url");
 
 
 
@@ -22,7 +22,7 @@ describe("Public API", function()
 			[
 				helpers.urls[0],
 				{ url:helpers.urls[0] },
-				{ url:urllib.parse(helpers.urls[0]) },
+				{ url:parseUrl(helpers.urls[0]) },
 				{ url:new URL(helpers.urls[0]) }
 				
 			].forEach(url =>
@@ -61,8 +61,14 @@ describe("Public API", function()
 				"/path/",
 				"resource.html",
 				"",
-				{ url:urllib.parse("/path/") },
-				{ url:{} }
+				1,
+				null,
+				{ url:parseUrl("/path/") },
+				{ url:{} },
+				{ url:[] },
+				{ url:"/path/" },
+				{ url:1 },
+				{ url:null }
 				
 			].forEach(url =>
 			{
