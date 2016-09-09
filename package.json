@@ -1,13 +1,13 @@
 {
   "name": "limited-request-queue",
   "description": "Interactively manage concurrency for outbound requests.",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "license": "MIT",
   "author": "Steven Vachon <contact@svachon.com> (https://www.svachon.com/)",
   "main": "lib",
   "repository": "stevenvachon/limited-request-queue",
   "dependencies": {
-    "is-browser": "^2.0.1",
+    "broquire": "^1.0.0",
     "is-string": "^1.0.4",
     "parse-domain": "~0.2.1",
     "whatwg-url": "^3.0.0"
