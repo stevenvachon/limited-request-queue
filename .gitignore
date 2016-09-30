@@ -1,1 +1,5 @@
+coverage/
+lib-es5/
 node_modules/
+.nyc_output/
+package-lock.json
