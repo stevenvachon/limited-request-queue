@@ -1,43 +1,46 @@
 {
   "name": "limited-request-queue",
   "description": "Interactively manage concurrency for outbound requests.",
-  "version": "3.0.4",
+  "version": "4.0.0-alpha",
   "license": "MIT",
   "author": "Steven Vachon <contact@svachon.com> (https://www.svachon.com/)",
   "main": "lib",
+  "browser": {
+    "parse-domain": "./lib/parseDomain"
+  },
   "repository": "stevenvachon/limited-request-queue",
   "dependencies": {
-    "broquire": "^1.0.0",
-    "is-string": "^1.0.4",
-    "parse-domain": "~0.2.1",
-    "whatwg-url": "^3.0.0"
+    "defined": "^1.0.0",
+    "isurl": "^1.0.0-alpha5",
+    "parse-domain": "^1.1.0"
   },
   "devDependencies": {
-    "browserify": "^13.1.0",
-    "chai": "^3.5.0",
-    "mocha": "^3.0.2",
-    "mocha-phantomjs": "4.1.0",
-    "object.assign": "^4.0.4",
-    "phantomjs-prebuilt": "^2.1.12",
-    "uglify-js": "^2.7.3"
+    "babel-preset-es2015": "^6.24.1",
+    "babelify": "^7.3.0",
+    "browserify": "^14.4.0",
+    "chai": "^4.0.0",
+    "coveralls": "^2.13.1",
+    "gzip-size-cli": "^2.0.0",
+    "mocha": "^3.4.2",
+    "nyc": "^10.3.2",
+    "uglify-js": "^3.0.12",
+    "universal-url": "^1.0.0-alpha"
   },
   "engines": {
-    "node": ">= 4"
+    "node": ">= 6"
   },
   "scripts": {
-    "browserify": "browserify lib/ --standalone RequestQueue | uglifyjs --compress --mangle -o browser/requestqueue.js",
-    "test": "npm run test_server && npm run test_browser",
-    "test_browser": "npm run browserify && mocha-phantomjs test/browser.html",
-    "test_server": "mocha test/server/ --reporter spec --check-leaks --bail"
+    "ci": "npm run test && nyc report --reporter=text-lcov | coveralls",
+    "posttest": "nyc report --reporter=html && browserify lib/ --global-transform [ babelify --presets [ es2015 ] ] --standalone RequestQueue | uglifyjs --compress --mangle | gzip-size",
+    "test": "nyc --reporter=text-summary mocha test/ --reporter=spec --check-leaks --bail"
   },
   "files": [
-    "lib",
-    "license"
+    "lib"
   ],
   "keywords": [
     "background",
     "concurrency",
-    "ddos",
+    "DoS",
     "http",
     "limiting",
     "queue",
