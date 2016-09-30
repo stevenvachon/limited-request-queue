@@ -1,14 +1,14 @@
 "use strict";
-var durations = require("./durations");
-var testUrls = require("./testUrls");
+const durations = require("./durations");
+const testUrls = require("./testUrls");
 
 
 
 module.exports = 
 {
-	addDurationGroup: durations.addGroup,
+	addDuration:      durations.add,
 	clearDurations:   durations.clear,
-	compareDurations: durations.compare,
+	previousDuration: durations.previous,
 	
 	options: require("./options"),
 	
