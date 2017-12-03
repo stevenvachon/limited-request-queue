@@ -12,7 +12,7 @@
   "dependencies": {
     "defined": "^1.0.0",
     "isurl": "^1.0.0",
-    "parse-domain": "^1.1.0"
+    "parse-domain": "^2.0.0"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.24.1",
