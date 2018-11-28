@@ -11,7 +11,7 @@
   "repository": "stevenvachon/limited-request-queue",
   "dependencies": {
     "defined": "^1.0.0",
-    "isurl": "^1.0.0",
+    "isurl": "^2.0.0",
     "parse-domain": "^1.1.0"
   },
   "devDependencies": {
