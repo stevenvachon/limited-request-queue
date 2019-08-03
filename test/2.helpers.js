@@ -11,7 +11,7 @@ describe("Test Helpers", () =>
 	it("testURLs() rejects non-URLs", async () =>
 	{
 		const opts = options();
-		const testError = new Error("this should not have resolved");
+		const testError = new Error("An error should have been thrown before this one");
 		const urls =
 		[
 			"https://www.google.com/",

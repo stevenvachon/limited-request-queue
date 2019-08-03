@@ -8,13 +8,11 @@
 * Pause/Resume at any time.
 
 ```js
-const RequestQueue = require('limited-request-queue');
-
 const queue = new RequestQueue()
-  .on('item', (url, data, done) => {
+  .on(ITEM_EVENT, (url, data, done) => {
     yourRequestLib(url, () => done());
   })
-  .on('end', () => console.log('Queue completed!'));
+  .on(END_EVENT, () => console.log('Queue completed!'));
 
 const urls = ['http://domain.com/dir1/', 'http://domain.com/dir2/'];
 urls.forEach(url => queue.enqueue(new URL(url)));
@@ -32,7 +30,19 @@ npm install limited-request-queue
 ```
 
 
-## Constructor
+## Usage
+
+Import as an ES Module:
+```js
+import RequestQueue, {END_EVENT, ITEM_EVENT} from 'limited-request-queue';
+```
+
+Import as a CommonJS Module:
+```js
+const {default:RequestQueue, END_EVENT, ITEM_EVENT} = require('limited-request-queue');
+```
+
+Constructor:
 ```js
 new RequestQueue(options);
 ```
@@ -108,16 +118,16 @@ The number of milliseconds to wait before each request. For a typical rate limit
 
 ## Events
 
-### `end`
+### `END_EVENT`, `'end'`
 Called when the last item in the queue has been completed/dequeued.
 
-### `item`
+### `ITEM_EVENT`, `'item'`
 Called when a queue item's turn has been reached. Arguments are: `url`, `data`, `done`. Call the `done` function when your item's operations are complete.
 
 
 [npm-image]: https://img.shields.io/npm/v/limited-request-queue.svg
 [npm-url]: https://npmjs.org/package/limited-request-queue
-[filesize-image]: https://img.shields.io/badge/size-4.5kB%20gzipped-blue.svg
+[filesize-image]: https://img.shields.io/badge/size-4.6kB%20gzipped-blue.svg
 [travis-image]: https://img.shields.io/travis/stevenvachon/limited-request-queue.svg
 [travis-url]: https://travis-ci.org/stevenvachon/limited-request-queue
 [coveralls-image]: https://img.shields.io/coveralls/stevenvachon/limited-request-queue.svg

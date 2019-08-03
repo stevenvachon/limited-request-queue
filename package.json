@@ -1,7 +1,7 @@
 {
   "name": "limited-request-queue",
   "description": "Interactively manage concurrency for outbound requests.",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "license": "MIT",
   "author": "Steven Vachon <contact@svachon.com> (https://svachon.com)",
   "repository": "github:stevenvachon/limited-request-queue",
@@ -14,18 +14,17 @@
     "parse-domain": "^2.3.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.5.0",
-    "@babel/core": "^7.5.4",
-    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.4.4",
     "@babel/plugin-proposal-optional-chaining": "^7.2.0",
     "@babel/plugin-proposal-private-methods": "^7.4.4",
-    "@babel/preset-env": "^7.5.4",
-    "babel-plugin-add-module-exports": "^1.0.2",
+    "@babel/preset-env": "^7.5.5",
     "chai": "^4.2.0",
     "coveralls": "^3.0.5",
     "gzip-size-cli": "^3.0.0",
-    "mocha": "^6.1.4",
+    "mocha": "^6.2.0",
     "nyc": "^14.1.1",
     "parcel": "^1.12.3",
     "rimraf": "^2.6.3"
@@ -35,7 +34,7 @@
   },
   "scripts": {
     "build": "npm run build-release && npm run build-size",
-    "build-release": "babel lib/ --out-dir=lib-es5 --plugins=@babel/proposal-class-properties,@babel/proposal-nullish-coalescing-operator,@babel/proposal-optional-chaining,@babel/proposal-private-methods,add-module-exports --presets=@babel/env --source-maps",
+    "build-release": "babel lib/ --out-dir=lib-es5 --plugins=@babel/proposal-class-properties,@babel/proposal-nullish-coalescing-operator,@babel/proposal-optional-chaining,@babel/proposal-private-methods --presets=@babel/env --source-maps",
     "build-size": "parcel build lib-es5/index.js --experimental-scope-hoisting --global=RequestQueue --log-level=1 --no-cache --out-dir='.' --out-file=temp.js --public-url='.' && gzip-size temp.js && rimraf temp.js temp.js.map",
     "ci": "npm test && nyc report --reporter=text-lcov | coveralls",
     "posttest": "nyc report --reporter=text-summary --reporter=html",

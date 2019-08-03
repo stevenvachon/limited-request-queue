@@ -1,13 +1,38 @@
 "use strict";
-const {addDuration, clearDurations, DELAY, expectedSyncMinDuration, options, previousDuration, testURLs, URLS} = require("./helpers");
+const {addDuration, clearDurations, DELAY, expectedSyncMinDuration, options, previousDuration, testURLs, URLS, WrongCallError} = require("./helpers");
 const {before, describe, it} = require("mocha");
+const {default:RequestQueue, DEFAULT_OPTIONS, END_EVENT, ITEM_EVENT} = require("../lib-es5");
 const {expect} = require("chai");
-const RequestQueue = require("../lib-es5");
 
 
 
 describe("Public API", () =>
 {
+	it("has static constants for key names", () =>
+	{
+		const keys =
+		[
+			DEFAULT_OPTIONS,
+			END_EVENT,
+			ITEM_EVENT
+		];
+
+		keys.forEach(key => expect(key).not.to.be.undefined);
+	});
+
+
+
+	it("default options cannot be changed", () =>
+	{
+		expect(DEFAULT_OPTIONS).to.include.key("ignorePorts");
+		expect(() => DEFAULT_OPTIONS.ignorePorts = "new value").to.throw();
+
+		expect(DEFAULT_OPTIONS).not.to.include.key("nonExistent");
+		expect(() => DEFAULT_OPTIONS.nonExistent = "new value").to.throw();
+	});
+
+
+
 	it("does not require options", () =>
 	{
 		expect(() => new RequestQueue()).not.to.throw();
@@ -92,14 +117,14 @@ describe("Public API", () =>
 
 	describe("Events", () =>
 	{
-		describe("item", () =>
+		describe(ITEM_EVENT, () =>
 		{
 			it("works", done =>
 			{
 				let count = 0;
 
 				const queue = new RequestQueue(options())
-				.on("item", (url, data, itemDone) =>
+				.on(ITEM_EVENT, (url, data, itemDone) =>
 				{
 					if (++count >= URLS.length)
 					{
@@ -117,7 +142,7 @@ describe("Public API", () =>
 				let count = 0;
 
 				const queue = new RequestQueue(options())
-				.on("item", (url, data, itemDone) =>
+				.on(ITEM_EVENT, (url, data, itemDone) =>
 				{
 					switch (++count)
 					{
@@ -153,7 +178,7 @@ describe("Public API", () =>
 			it("is not called with non-URLs", done =>
 			{
 				const queue = new RequestQueue(options())
-				.on("item", () => done( new Error("this should not have been called") ));
+				.on(ITEM_EVENT, () => done( new WrongCallError() ));
 
 				expect(() => queue.enqueue("url")).to.throw();
 
@@ -163,16 +188,16 @@ describe("Public API", () =>
 
 
 
-		describe("end", () =>
+		describe(END_EVENT, () =>
 		{
 			it("works", done =>
 			{
 				const queue = new RequestQueue(options())
-				.on("item", (url, data, itemDone) =>
+				.on(ITEM_EVENT, (url, data, itemDone) =>
 				{
 					setTimeout(itemDone, DELAY);
 				})
-				.on("end", () => done());
+				.on(END_EVENT, () => done());
 
 				URLS.forEach(url => queue.enqueue(new URL(url)));
 			});
@@ -183,7 +208,7 @@ describe("Public API", () =>
 			{
 				// Pause to prevent first queued item from immediately starting (and thus being auto-dequeued)
 				const queue = new RequestQueue(options()).pause()
-				.on("end", () =>
+				.on(END_EVENT, () =>
 				{
 					// Wait for `dequeued` to receive its value
 					// since everything here is performed synchronously
@@ -204,7 +229,7 @@ describe("Public API", () =>
 			it("is not called simply by calling resume()", done =>
 			{
 				const queue = new RequestQueue(options())
-				.on("end", () => done( new Error("this should not have been called") ));
+				.on(END_EVENT, () => done( new WrongCallError() ));
 
 				queue.resume();
 
@@ -216,7 +241,7 @@ describe("Public API", () =>
 			it("is not called on erroneous dequeue", done =>
 			{
 				const queue = new RequestQueue(options())
-				.on("end", () => done( new Error("this should not have been called") ));
+				.on(END_EVENT, () => done( new WrongCallError() ));
 
 				queue.dequeue(123);
 
@@ -269,11 +294,11 @@ describe("Public API", () =>
 		it("works", done =>
 		{
 			const queue = new RequestQueue(options())
-			.on("item", (url, data, itemDone) =>
+			.on(ITEM_EVENT, (url, data, itemDone) =>
 			{
 				setTimeout(itemDone, DELAY);
 			})
-			.on("end", () =>
+			.on(END_EVENT, () =>
 			{
 				expect( queue.numActive ).to.equal(0);
 				done();
@@ -289,7 +314,7 @@ describe("Public API", () =>
 		it("is not affected by dequeue()", done =>
 		{
 			const queue = new RequestQueue(options())
-			.on("item", (url, data, itemDone) =>
+			.on(ITEM_EVENT, (url, data, itemDone) =>
 			{
 				// Wait for `id` to be assigned its value
 				setImmediate( () =>
@@ -300,7 +325,7 @@ describe("Public API", () =>
 
 				setTimeout(itemDone, DELAY);
 			})
-			.on("end", () =>
+			.on(END_EVENT, () =>
 			{
 				expect( queue.numActive ).to.equal(0);
 				done();
@@ -320,11 +345,11 @@ describe("Public API", () =>
 		it("works", done =>
 		{
 			const queue = new RequestQueue(options())
-			.on("item", (url, data, itemDone) =>
+			.on(ITEM_EVENT, (url, data, itemDone) =>
 			{
 				setTimeout(itemDone, DELAY);
 			})
-			.on("end", () =>
+			.on(END_EVENT, () =>
 			{
 				expect( queue.numQueued ).to.equal(0);
 				done();
@@ -366,7 +391,7 @@ describe("Public API", () =>
 					const opts = options({ maxSockets:0 });
 
 					testURLs(URLS, opts)
-					.then(() => done( new Error("this should not have resolved") ));
+					.then(() => done( new WrongCallError() ));
 
 					setTimeout( () => done(), expectedSyncMinDuration() );
 				});
@@ -455,7 +480,7 @@ describe("Public API", () =>
 					const opts = options({ maxSocketsPerHost:0 });
 
 					testURLs(URLS, opts)
-					.then(() => done( new Error("this should not have resolved") ));
+					.then(() => done( new WrongCallError() ));
 
 					setTimeout( () => done(), expectedSyncMinDuration() );
 				});

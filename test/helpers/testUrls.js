@@ -1,5 +1,5 @@
 "use strict";
-const RequestQueue = require("../../lib-es5");
+const {default:RequestQueue, END_EVENT, ITEM_EVENT} = require("../../lib-es5");
 
 const DELAY = 18;	// long enough without trying everyone's patience
 
@@ -48,7 +48,7 @@ const testURLs = (urls, options, optionOverrides, eachCallback) => new Promise(r
 	const startTime = Date.now();
 
 	const queue = new RequestQueue(options)
-	.on("item", (url, data, done) =>
+	.on(ITEM_EVENT, (url, data, done) =>
 	{
 		results.push(url.href);
 
@@ -60,7 +60,7 @@ const testURLs = (urls, options, optionOverrides, eachCallback) => new Promise(r
 		// Simulate a remote connection
 		setTimeout(() => done(), DELAY);
 	})
-	.on("end", () =>
+	.on(END_EVENT, () =>
 	{
 		const duration = Date.now() - startTime;
 
