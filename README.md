@@ -62,6 +62,9 @@ Adds a URL to the queue. Returns a queue item ID on success.
 * `data` is optional and can be of any type.
 * `options` is an optional `Object` that overrides any defined options in the constructor (except for `maxSockets`).
 
+### `.has(id)`
+Returns `true` if the queue contains an active or queued item tagged with `id` and `false` if not.
+
 ### `.isPaused`
 Returns `true` if the queue is currently paused and `false` if not.
 
