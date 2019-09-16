@@ -40,7 +40,7 @@ describe("Public API", () =>
 
 
 
-	describe("enqueue(), length", () =>
+	describe("enqueue(), has(), length", () =>
 	{
 		it("enqueues valid URLs", () =>
 		{
@@ -48,9 +48,19 @@ describe("Public API", () =>
 			const queue = new RequestQueue(options()).pause();
 			const url1 = new URL("http://domain1/");
 			const url2 = new URL("http://domain2/");
+			const expectedId1 = 0;
+			const expectedId2 = 1;
 
-			expect( queue.enqueue(url1) ).to.be.a("number");
-			expect( queue.enqueue(url2) ).to.be.a("number");
+			expect( queue.has(expectedId1) ).to.be.false;
+			expect( queue.has(expectedId2) ).to.be.false;
+
+			const id1 = queue.enqueue(url1);
+			const id2 = queue.enqueue(url2);
+
+			expect(id1).to.equal(expectedId1);
+			expect(id2).to.equal(expectedId2);
+			expect( queue.has(id1) ).to.be.true;
+			expect( queue.has(id2) ).to.be.true;
 			expect( queue.length ).to.equal(2);
 		});
 
@@ -70,6 +80,7 @@ describe("Public API", () =>
 				/regex/,
 				true,
 				1,
+				BigInt(1),
 				null,
 				undefined
 			];
@@ -84,17 +95,17 @@ describe("Public API", () =>
 
 
 
-	describe("dequeue(), length", () =>
+	describe("dequeue(), has(), length", () =>
 	{
 		it("dequeues valid IDs", () =>
 		{
 			// Pause to prevent first queued item from immediately starting (and thus being auto-dequeued)
 			const queue = new RequestQueue(options()).pause();
-
 			const url = new URL("http://domain/");
 			const id = queue.enqueue(url);
 
 			expect( queue.dequeue(id) ).to.be.true;
+			expect( queue.has(id) ).to.be.false;
 			expect( queue.length ).to.equal(0);
 		});
 
@@ -104,7 +115,6 @@ describe("Public API", () =>
 		{
 			// Pause to prevent first queued item from immediately starting (and thus being auto-dequeued)
 			const queue = new RequestQueue(options()).pause();
-
 			const url = new URL("http://domain/");
 			const id = queue.enqueue(url);
 

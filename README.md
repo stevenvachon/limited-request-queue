@@ -24,7 +24,7 @@ setTimeout(queue.resume, 5000);
 
 ## Installation
 
-[Node.js](http://nodejs.org) `>= 10` is required. To install, type this at the command line:
+[Node.js](https://nodejs.org) `>= 10` is required. To install, type this at the command line:
 ```shell
 npm install limited-request-queue
 ```
@@ -58,9 +58,12 @@ Removes a queue item from the queue. Returns `true` if a queue item was removed 
 ### `.enqueue(url[, data, options])`
 Adds a URL to the queue. Returns a queue item ID on success.
 
-* `url` *must* a [`URL`](https://developer.mozilla.org/en/docs/Web/API/URL/) instance.
+* `url` *must* a [`URL`](https://mdn.io/URL/) instance.
 * `data` is optional and can be of any type.
 * `options` is an optional `Object` that overrides any defined options in the constructor (except for `maxSockets`).
+
+### `.has(id)`
+Returns `true` if the queue contains an active or queued item tagged with `id` and `false` if not.
 
 ### `.isPaused`
 Returns `true` if the queue is currently paused and `false` if not.
