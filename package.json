@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "isurl": "^4.0.1",
-    "parse-domain": "^2.3.2"
+    "parse-domain": "^2.3.2",
+    "snyk": "^1.319.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.0",
@@ -40,7 +41,9 @@
     "posttest": "nyc report --reporter=text-summary --reporter=html",
     "prepublishOnly": "npm test",
     "pretest": "npm run build",
-    "test": "nyc --silent mocha test/ --bail --check-leaks"
+    "test": "nyc --silent mocha test/ --bail --check-leaks",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "files": [
     "lib",
@@ -57,5 +60,6 @@
     "rate",
     "request",
     "throttle"
-  ]
+  ],
+  "snyk": true
 }
