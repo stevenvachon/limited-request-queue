@@ -2,7 +2,7 @@
 
 
 
-const options = overrides => Object.freeze(
+module.exports = overrides => Object.freeze(
 {
 	ignorePorts: false,
 	ignoreProtocols: false,
@@ -15,4 +15,3 @@ const options = overrides => Object.freeze(
 
 
 
-module.exports = options;

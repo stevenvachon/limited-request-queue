@@ -24,7 +24,7 @@ setTimeout(queue.resume, 5000);
 
 ## Installation
 
-[Node.js](https://nodejs.org) `>= 10` is required. To install, type this at the command line:
+[Node.js](https://nodejs.org) `>= 14` is required. To install, type this at the command line:
 ```shell
 npm install limited-request-queue
 ```
@@ -39,7 +39,7 @@ import RequestQueue, {END_EVENT, ITEM_EVENT} from 'limited-request-queue';
 
 Import as a CommonJS Module:
 ```js
-const {default:RequestQueue, END_EVENT, ITEM_EVENT} = require('limited-request-queue');
+const {END_EVENT, ITEM_EVENT, RequestQueue} = require('limited-request-queue');
 ```
 
 Constructor:
@@ -130,7 +130,7 @@ Called when a queue item's turn has been reached. Arguments are: `url`, `data`, 
 
 [npm-image]: https://img.shields.io/npm/v/limited-request-queue.svg
 [npm-url]: https://npmjs.org/package/limited-request-queue
-[filesize-image]: https://img.shields.io/badge/size-4.6kB%20gzipped-blue.svg
+[filesize-image]: https://img.shields.io/badge/bundle-40kB%20gzipped-blue.svg
 [travis-image]: https://img.shields.io/travis/stevenvachon/limited-request-queue.svg
 [travis-url]: https://travis-ci.org/stevenvachon/limited-request-queue
 [coveralls-image]: https://img.shields.io/coveralls/stevenvachon/limited-request-queue.svg

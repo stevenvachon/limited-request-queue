@@ -5,7 +5,7 @@ const {options, testURLs} = require("./helpers");
 
 
 
-// NOTE :: this makes sure that other tests were tested correctly
+// This makes sure that other tests were tested correctly
 describe("Test Helpers", () =>
 {
 	it("testURLs() rejects non-URLs", async () =>

@@ -1,23 +1,24 @@
 "use strict";
 const {addDuration, clearDurations, DELAY, expectedSyncMinDuration, options, previousDuration, testURLs, URLS, WrongCallError} = require("./helpers");
 const {before, describe, it} = require("mocha");
-const {default:RequestQueue, DEFAULT_OPTIONS, END_EVENT, ITEM_EVENT} = require("../lib-es5");
+const {DEFAULT_OPTIONS, END_EVENT, ITEM_EVENT, RequestQueue} = require("../lib");
 const {expect} = require("chai");
 
 
 
 describe("Public API", () =>
 {
-	it("has static constants for key names", () =>
+	it("has (CommonJS) exports", () =>
 	{
-		const keys =
+		const constants =
 		[
 			DEFAULT_OPTIONS,
 			END_EVENT,
-			ITEM_EVENT
+			ITEM_EVENT,
+			RequestQueue
 		];
 
-		keys.forEach(key => expect(key).not.to.be.undefined);
+		constants.forEach(constant => expect(constant).not.to.be.undefined);
 	});
 
 
@@ -981,7 +982,7 @@ describe("Public API", () =>
 
 							"https://google.com:8080/",
 							"https://google.com/something.html",
-							"http://google.com:8080/",  // TODO :: why is this one here and not after its https cousin?
+							"http://google.com:8080/",  // @todo why is this one here and not after its https cousin?
 
 							"http://google.com/something.html",
 							"https://google.com/something.html",
@@ -1055,7 +1056,7 @@ describe("Public API", () =>
 
 							"https://google.com/",
 							"https://google.com/something.html",
-							"http://google.com/",  // TODO :: why is this one here and not after its https cousin?
+							"http://google.com/",  // @todo why is this one here and not after its https cousin?
 							"http://google.com/something.html",
 							"https://google.com/something.html",
 							"http://google.com/something.html"

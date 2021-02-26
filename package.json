@@ -1,51 +1,50 @@
 {
   "name": "limited-request-queue",
   "description": "Interactively manage concurrency for outbound requests.",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "license": "MIT",
   "author": "Steven Vachon <contact@svachon.com> (https://svachon.com)",
   "repository": "github:stevenvachon/limited-request-queue",
-  "main": "lib-es5",
-  "browser": {
-    "parse-domain": "./shims/parse-domain"
+  "exports": {
+    ".": {
+      "import": "./lib/index.mjs",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
   },
+  "browser": "lib-es5",
   "dependencies": {
     "isurl": "^4.0.1",
-    "parse-domain": "^2.3.2"
+    "parse-domain": "^3.0.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.6.0",
-    "@babel/core": "^7.6.0",
-    "@babel/plugin-proposal-class-properties": "^7.5.5",
-    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.4.4",
-    "@babel/plugin-proposal-optional-chaining": "^7.6.0",
-    "@babel/plugin-proposal-private-methods": "^7.6.0",
-    "@babel/preset-env": "^7.6.0",
-    "chai": "^4.2.0",
-    "coveralls": "^3.0.6",
-    "gzip-size-cli": "^3.0.0",
-    "mocha": "^6.2.0",
-    "nyc": "^14.1.1",
-    "parcel": "^1.12.3",
-    "rimraf": "^3.0.0"
+    "@babel/cli": "^7.13.0",
+    "@babel/core": "^7.13.1",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/plugin-proposal-private-methods": "^7.13.0",
+    "@babel/preset-env": "^7.13.5",
+    "babelify": "^10.0.0",
+    "browserify": "^17.0.0",
+    "c8": "^7.6.0",
+    "chai": "^4.3.0",
+    "coveralls": "^3.1.0",
+    "gzip-size-cli": "^4.0.0",
+    "mocha": "^8.3.0",
+    "terser": "^5.6.0"
   },
   "engines": {
-    "node": ">= 10"
+    "node": ">= 14"
   },
   "scripts": {
-    "build": "npm run build-release && npm run build-size",
-    "build-release": "babel lib/ --out-dir=lib-es5 --plugins=@babel/proposal-class-properties,@babel/proposal-nullish-coalescing-operator,@babel/proposal-optional-chaining,@babel/proposal-private-methods --presets=@babel/env --source-maps",
-    "build-size": "parcel build lib-es5/index.js --experimental-scope-hoisting --global=RequestQueue --log-level=1 --no-cache --out-dir='.' --out-file=temp.js --public-url='.' && gzip-size temp.js && rimraf temp.js temp.js.map",
-    "ci": "npm test && nyc report --reporter=text-lcov | coveralls",
-    "posttest": "nyc report --reporter=text-summary --reporter=html",
+    "build": "babel lib/ --extensions=.js --out-dir=lib-es5/ --plugins=@babel/proposal-class-properties,@babel/proposal-private-methods --presets=@babel/env --source-maps",
+    "ci": "npm test && c8 report --reporter=text-lcov | coveralls",
+    "posttest": "c8 report --reporter=text-summary --reporter=html && npm run build --silent && browserify lib-es5/ --standalone=RequestQueue | terser --compress --mangle | gzip-size",
     "prepublishOnly": "npm test",
-    "pretest": "npm run build",
-    "test": "nyc --silent mocha test/ --bail --check-leaks"
+    "test": "c8 mocha test/ --check-leaks --bail"
   },
   "files": [
     "lib",
-    "lib-es5",
-    "shims"
+    "lib-es5"
   ],
   "keywords": [
     "background",

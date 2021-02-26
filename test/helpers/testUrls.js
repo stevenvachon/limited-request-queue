@@ -1,7 +1,8 @@
-"use strict";
-const {default:RequestQueue, END_EVENT, ITEM_EVENT} = require("../../lib-es5");
+const {END_EVENT, ITEM_EVENT, RequestQueue} = require("../../lib");
 
-const DELAY = 18;	// long enough without trying everyone's patience
+
+
+const DELAY = 18;  // long enough without trying everyone's patience
 
 const URLS =
 [
